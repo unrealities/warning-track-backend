@@ -1,13 +1,21 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 )
 
 // GetGameDataByDay returns useful (to Warning-Track) game information for given date
 func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
-
+	var d struct {
+		Date time.Time `json:"date"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&d); err != nil {
+		return
+	}
+	fmt.Println(statsAPIScheduledURL(d.Date))
 }
 
 // statsAPIScheduleURL returns the URL for all the game schedule data for the given time
