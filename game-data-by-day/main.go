@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"time"
 )
@@ -15,7 +16,18 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewDecoder(r.Body).Decode(&d); err != nil {
 		return
 	}
-	fmt.Println(statsAPIScheduledURL(d.Date))
+
+	resp, err := http.Get(statsAPIScheduledURL(d.Date))
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	}
+
+	fmt.Println(body)
 }
 
 // statsAPIScheduleURL returns the URL for all the game schedule data for the given time
