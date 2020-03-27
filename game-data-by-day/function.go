@@ -1,43 +1,65 @@
 package function
 
 import (
+	"context"
 	"encoding/json"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
+
+	"cloud.google.com/go/logging"
 )
 
 // GetGameDataByDay returns useful (to Warning-Track) game information for given date
 func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
+	logger, err := logger()
+	if err != nil {
+		log.Printf("Error setuping logger")
+		return
+	}
+
+	logger.Printf("Received request: %+v", r.Body)
+
 	var d struct {
 		Date time.Time `json:"date"`
 	}
-	log.Printf("Received request: %+v", r.Body)
-
 	if err := json.NewDecoder(r.Body).Decode(&d); err != nil {
-		log.Printf("Error attempting to decode json body: %s", err)
+		logger.Printf("Error attempting to decode json body: %s", err)
 		return
 	}
-	log.Printf("Date requested: %+v", d.Date)
+	logger.Printf("Date requested: %+v", d.Date)
 
 	URL := statsAPIScheduledURL(d.Date)
-	log.Printf("Making Get request: %s", URL)
+	logger.Printf("Making Get request: %s", URL)
 	resp, err := http.Get(URL)
 	if err != nil {
-		log.Printf("Error in Get request: %s", err)
+		logger.Printf("Error in Get request: %s", err)
 		return
 	}
 	defer resp.Body.Close()
 
-	log.Printf("Parsing response from Get request: %+v", resp.Body)
+	logger.Printf("Parsing response from Get request: %+v", resp.Body)
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Printf("Error reading Get response body: %s", err)
+		logger.Printf("Error reading Get response body: %s", err)
 		return
 	}
 
-	log.Printf("successfully received response from Get: %+v", body)
+	logger.Printf("successfully received response from Get: %+v", body)
+}
+
+// logger returns a logger to create appropriate logs in Google Cloud
+func logger() logging.Logger {
+	ctx := context.Background
+	logName := "get-game-data-by-day"
+	projectID := "warning-track-backend"
+	client, err := logging.NewClient(ctx, projectID)
+	if err != nil {
+		return nil, err
+	}
+	defer client.Close()
+	return client.Logger(logName).StandardLogger(logging.Info), nil
 }
 
 // statsAPIScheduleURL returns the URL for all the game schedule data for the given time
