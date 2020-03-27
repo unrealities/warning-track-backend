@@ -2,8 +2,8 @@ package function
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"time"
 )
@@ -13,21 +13,31 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	var d struct {
 		Date time.Time `json:"date"`
 	}
+	log.Printf("Received request: %+v", r.Body)
+
 	if err := json.NewDecoder(r.Body).Decode(&d); err != nil {
+		log.Printf("Error attempting to decode json body: %s", err)
 		return
 	}
+	log.Printf("Date requested: %+v", d.Date)
 
-	resp, err := http.Get(statsAPIScheduledURL(d.Date))
+	URL := statsAPIScheduledURL(d.Date)
+	log.Printf("Making Get request: %s", URL)
+	resp, err := http.Get(URL)
 	if err != nil {
+		log.Printf("Error in Get request: %s", err)
 		return
 	}
 	defer resp.Body.Close()
+
+	log.Printf("Parsing response from Get request: %+v", resp.Body)
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+		log.Printf("Error reading Get response body: %s", err)
 		return
 	}
 
-	fmt.Println(body)
+	log.Printf("successfully received response from Get: %+v", body)
 }
 
 // statsAPIScheduleURL returns the URL for all the game schedule data for the given time
