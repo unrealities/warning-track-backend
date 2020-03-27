@@ -13,11 +13,17 @@ import (
 
 // GetGameDataByDay returns useful (to Warning-Track) game information for given date
 func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
-	logger, err := logger()
+	// setup Logger
+	ctx := context.Background()
+	logName := "get-game-data-by-day"
+	projectID := "warning-track-backend"
+	client, err := logging.NewClient(ctx, projectID)
 	if err != nil {
 		log.Printf("Error setuping logger")
 		return
 	}
+	defer client.Close()
+	logger := client.Logger(logName).StandardLogger(logging.Info)
 
 	logger.Printf("Received request: %+v", r.Body)
 
@@ -47,19 +53,6 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logger.Printf("successfully received response from Get: %+v", body)
-}
-
-// logger returns a logger to create appropriate logs in Google Cloud
-func logger() (*log.Logger, error) {
-	ctx := context.Background()
-	logName := "get-game-data-by-day"
-	projectID := "warning-track-backend"
-	client, err := logging.NewClient(ctx, projectID)
-	if err != nil {
-		return nil, err
-	}
-	defer client.Close()
-	return client.Logger(logName).StandardLogger(logging.Info), nil
 }
 
 // statsAPIScheduleURL returns the URL for all the game schedule data for the given time
