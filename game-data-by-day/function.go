@@ -50,8 +50,8 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 }
 
 // logger returns a logger to create appropriate logs in Google Cloud
-func logger() logging.Logger {
-	ctx := context.Background
+func logger() (*log.Logger, error) {
+	ctx := context.Background()
 	logName := "get-game-data-by-day"
 	projectID := "warning-track-backend"
 	client, err := logging.NewClient(ctx, projectID)
