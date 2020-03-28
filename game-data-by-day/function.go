@@ -3,6 +3,7 @@ package function
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -12,6 +13,9 @@ import (
 )
 
 // GetGameDataByDay returns useful (to Warning-Track) game information for given date
+//
+// ex.: https://us-central1-warning-track-backend.cloudfunctions.net/GetGameDataByDay -d {'"date":"03-01-20"'}
+//
 func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	// setup Logger
 	ctx := context.Background()
@@ -53,6 +57,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logger.Printf("successfully received response from Get: %+v", body)
+	fmt.Fprintf(w, string(body))
 }
 
 // statsAPIScheduleURL returns the URL for all the game schedule data for the given time
