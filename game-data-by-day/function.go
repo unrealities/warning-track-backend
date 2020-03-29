@@ -14,7 +14,7 @@ import (
 
 // GetGameDataByDay returns useful (to Warning-Track) game information for given date
 //
-// ex.: https://us-central1-warning-track-backend.cloudfunctions.net/GetGameDataByDay -d {'"date":"03-01-20"'}
+// ex.: https://us-central1-warning-track-backend.cloudfunctions.net/GetGameDataByDay -d {'"date":"03-01-2020"'}
 //
 func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	// setup Logger
@@ -40,7 +40,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	}
 	logger.Printf("Date requested: %+v", d.Date)
 
-	parsedDate, err := time.Parse("2006-01-02", d.Date)
+	parsedDate, err := time.Parse("01-02-2006", d.Date)
 	if err != nil {
 		logger.Printf("Error parsing date requested: %s", err)
 	}
