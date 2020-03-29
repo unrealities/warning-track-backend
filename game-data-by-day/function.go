@@ -32,7 +32,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	logger.Printf("Received request: %+v", r.Body)
 
 	var d struct {
-		Date time.Time `json:"date"`
+		Date string `json:"date"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&d); err != nil {
 		logger.Printf("Error attempting to decode json body: %s", err)
@@ -40,7 +40,12 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	}
 	logger.Printf("Date requested: %+v", d.Date)
 
-	URL := statsAPIScheduledURL(d.Date)
+	parsedDate, err := time.Parse("2006-01-02", d.Date)
+	if err != nil {
+		logger.Printf("Error parsing date requested: %s", err)
+	}
+
+	URL := statsAPIScheduledURL(parsedDate)
 	logger.Printf("Making Get request: %s", URL)
 	resp, err := http.Get(URL)
 	if err != nil {
