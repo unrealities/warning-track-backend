@@ -3,7 +3,6 @@ package function
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -45,7 +44,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		logger.Printf("Error parsing date requested: %s", err)
 	}
 
-	URL := statsAPIScheduledURL(parsedDate)
+	URL := statsAPIScheduleURL(parsedDate)
 	logger.Printf("Making Get request: %s", URL)
 	resp, err := http.Get(URL)
 	if err != nil {
@@ -62,11 +61,20 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logger.Printf("successfully received response from Get: %+v", body)
-	fmt.Fprintf(w, string(body))
+
+	statsAPIScheduleResp := statsAPISchedule{}
+	err = json.Unmarshal(body, &statsAPIScheduleResp)
+	if err != nil {
+		logger.Printf("Error trying to unmarshal response from statsAPI: %s", err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(r)
 }
 
 // statsAPIScheduleURL returns the URL for all the game schedule data for the given time
-func statsAPIScheduledURL(time time.Time) string {
+func statsAPIScheduleURL(time time.Time) string {
 	host := "http://statsapi.mlb.com"
 	path := "/api/v1/schedule"
 	query := "?sportId=1&hydrate=game(content(summary,media(epg))),linescore(runners),flags,team&date="
