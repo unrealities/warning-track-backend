@@ -70,7 +70,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(r)
+	json.NewEncoder(w).Encode(statsAPIScheduleResp)
 }
 
 // statsAPIScheduleURL returns the URL for all the game schedule data for the given time
