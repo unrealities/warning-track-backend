@@ -69,8 +69,16 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO: Integrate with Firebase to persist data
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(statsAPIScheduleResp)
+}
+
+// fireBaseUpdater creates or updates the firebase entry for the given day
+func fireBaseUpdater(time time.Time) {
+	// TODO: Need to make a create or update
+	// https://firebase.google.com/docs/reference/rest/database
 }
 
 // statsAPIScheduleURL returns the URL for all the game schedule data for the given time
