@@ -1,6 +1,7 @@
 package function
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"io/ioutil"
@@ -69,16 +70,36 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: Integrate with Firebase to persist data
+	// Integrate with Firebase to persist data
+	httpClient := &http.Client{}
+	fbPUTUrl := firebaseURL(parsedDate)
+	b, err := json.Marshal(statsAPIScheduleResp)
+	if err != nil {
+		logger.Printf("Error trying to marshal response from statsAPI: %s", err)
+		return
+	}
+	data := bytes.NewBuffer(b)
+	req, err := http.NewRequest(http.MethodPut, fbPUTUrl, data)
+	if err != nil {
+		logger.Printf("Error preparing PUT request to Firebase: %s", err)
+	}
+	_, err = httpClient.Do(req)
+	if err != nil {
+		logger.Printf("Error trying to make PUT to %s: %s", fbPUTUrl, err)
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(statsAPIScheduleResp)
 }
 
-// fireBaseUpdater creates or updates the firebase entry for the given day
-func fireBaseUpdater(time time.Time) {
-	// TODO: Need to make a create or update
-	// https://firebase.google.com/docs/reference/rest/database
+// firebaseURL returns the URL for firebase for this project
+func firebaseURL(time time.Time) string {
+	firebaseNamespace := "warning-track-backend"
+	databaseCollection := "game-data-by-day"
+	month := time.Format("01")
+	day := time.Format("02")
+	year := time.Format("2006")
+	return "https://" + firebaseNamespace + ".firebaseio.com/" + databaseCollection + "/" + month + "/" + day + "/" + year + ".json"
 }
 
 // statsAPIScheduleURL returns the URL for all the game schedule data for the given time
