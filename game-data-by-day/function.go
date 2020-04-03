@@ -54,14 +54,14 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	logger.Printf("Parsing response from Get request: %+v", resp.Body)
+	logger.Println("Parsing response from Get request")
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		logger.Printf("Error reading Get response body: %s", err)
 		return
 	}
 
-	logger.Printf("successfully received response from Get: %+v", body)
+	logger.Println("successfully received response from Get")
 
 	statsAPIScheduleResp := statsAPISchedule{}
 	err = json.Unmarshal(body, &statsAPIScheduleResp)
