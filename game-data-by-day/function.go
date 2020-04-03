@@ -23,41 +23,39 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	projectID := "warning-track-backend"
 	client, err := logging.NewClient(ctx, projectID)
 	if err != nil {
-		log.Printf("Error setuping logger")
+		log.Printf("error setting up logger")
 		return
 	}
 	defer client.Close()
 	logger := client.Logger(logName).StandardLogger(logging.Info)
 
-	logger.Printf("Received request: %+v", r.Body)
-
 	var d struct {
 		Date string `json:"date"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&d); err != nil {
-		logger.Printf("Error attempting to decode json body: %s", err)
+		logger.Printf("error attempting to decode json body: %s", err)
 		return
 	}
-	logger.Printf("Date requested: %+v", d.Date)
+	logger.Printf("date requested: %+v", d.Date)
 
 	parsedDate, err := time.Parse("01-02-2006", d.Date)
 	if err != nil {
-		logger.Printf("Error parsing date requested: %s", err)
+		logger.Printf("error parsing date requested: %s", err)
 	}
 
 	URL := statsAPIScheduleURL(parsedDate)
-	logger.Printf("Making Get request: %s", URL)
+	logger.Printf("making Get request: %s", URL)
 	resp, err := http.Get(URL)
 	if err != nil {
-		logger.Printf("Error in Get request: %s", err)
+		logger.Printf("error in Get request: %s", err)
 		return
 	}
 	defer resp.Body.Close()
 
-	logger.Println("Parsing response from Get request")
+	logger.Println("parsing response from Get request")
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		logger.Printf("Error reading Get response body: %s", err)
+		logger.Printf("error reading Get response body: %s", err)
 		return
 	}
 
@@ -66,7 +64,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	statsAPIScheduleResp := statsAPISchedule{}
 	err = json.Unmarshal(body, &statsAPIScheduleResp)
 	if err != nil {
-		logger.Printf("Error trying to unmarshal response from statsAPI: %s", err)
+		logger.Printf("error trying to unmarshal response from statsAPI: %s", err)
 		return
 	}
 
@@ -75,17 +73,19 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	fbPUTUrl := firebaseURL(parsedDate)
 	b, err := json.Marshal(statsAPIScheduleResp)
 	if err != nil {
-		logger.Printf("Error trying to marshal response from statsAPI: %s", err)
+		logger.Printf("error trying to marshal response from statsAPI: %s", err)
 		return
 	}
 	data := bytes.NewBuffer(b)
+
 	req, err := http.NewRequest(http.MethodPut, fbPUTUrl, data)
 	if err != nil {
-		logger.Printf("Error preparing PUT request to Firebase: %s", err)
+		logger.Printf("error preparing PUT request to Firebase: %s", err)
 	}
+	logger.Printf("making Put request to firebase: %s", fbPUTUrl)
 	_, err = httpClient.Do(req)
 	if err != nil {
-		logger.Printf("Error trying to make PUT to %s: %s", fbPUTUrl, err)
+		logger.Printf("error trying to make PUT to %s: %s", fbPUTUrl, err)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
