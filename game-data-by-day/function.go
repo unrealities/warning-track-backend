@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -12,59 +13,65 @@ import (
 	"cloud.google.com/go/logging"
 )
 
+// LogMessage is a simple struct to ensure JSON formatting in logs
+type LogMessage struct {
+	Message string
+}
+
 // GetGameDataByDay returns useful (to Warning-Track) game information for given date
 //
 // ex.: https://us-central1-warning-track-backend.cloudfunctions.net/GetGameDataByDay -d {'"date":"03-01-2020"'}
 //
 func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
-	// setup Logger
+	// setup lg
 	ctx := context.Background()
 	logName := "get-game-data-by-day"
 	projectID := "warning-track-backend"
 	client, err := logging.NewClient(ctx, projectID)
 	if err != nil {
-		log.Printf("error setting up logger")
+		log.Printf("error setting up Google Cloud lg")
 		return
 	}
 	defer client.Close()
-	logger := client.Logger(logName).StandardLogger(logging.Info)
+	lg := client.Logger(logName)
 
 	var d struct {
 		Date string `json:"date"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&d); err != nil {
-		logger.Printf("error attempting to decode json body: %s", err)
+		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error attempting to decode json body: %s", err)}})
 		return
 	}
-	logger.Printf("date requested: %+v", d.Date)
+	lg.Log(logging.Entry{Severity: logging.Debug, Payload: LogMessage{Message: fmt.Sprintf("date requested: %+v", d.Date)}})
 
 	parsedDate, err := time.Parse("01-02-2006", d.Date)
 	if err != nil {
-		logger.Printf("error parsing date requested: %s", err)
+		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error parsing date requested: %s", err)}})
+		return
 	}
 
 	URL := statsAPIScheduleURL(parsedDate)
-	logger.Printf("making Get request: %s", URL)
+	lg.Log(logging.Entry{Severity: logging.Debug, Payload: LogMessage{Message: fmt.Sprintf("making Get request: %s", URL)}})
 	resp, err := http.Get(URL)
 	if err != nil {
-		logger.Printf("error in Get request: %s", err)
+		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error in Get request: %s", err)}})
 		return
 	}
 	defer resp.Body.Close()
 
-	logger.Println("parsing response from Get request")
+	lg.Log(logging.Entry{Severity: logging.Debug, Payload: LogMessage{Message: "parsing response from Get request"}})
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		logger.Printf("error reading Get response body: %s", err)
+		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error reading Get response body: %s", err)}})
 		return
 	}
 
-	logger.Println("successfully received response from Get")
+	lg.Log(logging.Entry{Severity: logging.Debug, Payload: LogMessage{Message: "successfully received response from Get"}})
 
 	statsAPIScheduleResp := statsAPISchedule{}
 	err = json.Unmarshal(body, &statsAPIScheduleResp)
 	if err != nil {
-		logger.Printf("error trying to unmarshal response from statsAPI: %s", err)
+		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error trying to unmarshal response from statsAPI: %s", err)}})
 		return
 	}
 
@@ -73,19 +80,21 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	fbPUTUrl := firebaseURL(parsedDate)
 	b, err := json.Marshal(statsAPIScheduleResp)
 	if err != nil {
-		logger.Printf("error trying to marshal response from statsAPI: %s", err)
+		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error trying to marshal response from statsAPI: %s", err)}})
 		return
 	}
 	data := bytes.NewBuffer(b)
-
 	req, err := http.NewRequest(http.MethodPut, fbPUTUrl, data)
+	lg.Log(logging.Entry{Severity: logging.Debug, Payload: LogMessage{Message: "successfully received response from Get"}})
 	if err != nil {
-		logger.Printf("error preparing PUT request to Firebase: %s", err)
+		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error preparing PUT request to Firebase: %s", err)}})
+		return
 	}
-	logger.Printf("making Put request to firebase: %s", fbPUTUrl)
+	lg.Log(logging.Entry{Severity: logging.Debug, Payload: LogMessage{Message: fmt.Sprintf("making Put request to firebase: %s", fbPUTUrl)}})
 	_, err = httpClient.Do(req)
 	if err != nil {
-		logger.Printf("error trying to make PUT to %s: %s", fbPUTUrl, err)
+		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error trying to make PUT to %s: %s", fbPUTUrl, err)}})
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
