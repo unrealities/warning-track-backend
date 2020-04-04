@@ -87,7 +87,6 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	}
 	data := bytes.NewBuffer(b)
 	req, err := http.NewRequest(http.MethodPut, fbPUTUrl, data)
-	lg.Log(logging.Entry{Severity: logging.Debug, Payload: LogMessage{Message: "successfully received response from Get"}})
 	if err != nil {
 		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error preparing PUT request to Firebase: %s", err)}})
 		return
@@ -110,7 +109,7 @@ func firebaseURL(time time.Time) string {
 	month := time.Format("01")
 	day := time.Format("02")
 	year := time.Format("2006")
-	return "https://" + firebaseNamespace + ".firebaseio.com/" + databaseCollection + "/" + month + "/" + day + "/" + year + ".json"
+	return "https://" + firebaseNamespace + ".firebaseio.com/" + databaseCollection + "/" + month + "-" + day + "-" + year + ".json"
 }
 
 // statsAPIScheduleURL returns the URL for all the game schedule data for the given time
