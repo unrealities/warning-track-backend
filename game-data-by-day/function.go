@@ -13,6 +13,11 @@ import (
 	"cloud.google.com/go/logging"
 )
 
+const (
+	logName   = "get-game-data-by-day"
+	projectID = "warning-track-backend"
+)
+
 // LogMessage is a simple struct to ensure JSON formatting in logs
 type LogMessage struct {
 	Message string
@@ -25,12 +30,9 @@ type LogMessage struct {
 func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	// setup lg
 	ctx := context.Background()
-	logName := "get-game-data-by-day"
-	projectID := "warning-track-backend"
 	client, err := logging.NewClient(ctx, projectID)
 	if err != nil {
-		log.Printf("error setting up Google Cloud lg")
-		return
+		log.Fatalf("error setting up Google Cloud logger")
 	}
 	defer client.Close()
 	lg := client.Logger(logName)
