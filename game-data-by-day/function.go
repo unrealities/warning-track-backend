@@ -91,6 +91,10 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error preparing PUT request to Firebase: %s", err)}})
 		return
 	}
+
+	// TODO: Need auth here. Get permission denied without auth.
+	// https://firebase.google.com/docs/auth/admin/create-custom-tokens
+	// https://github.com/firebase/firebase-admin-go/blob/master/snippets/db.go
 	lg.Log(logging.Entry{Severity: logging.Debug, Payload: LogMessage{Message: fmt.Sprintf("making Put request to firebase: %s", fbPUTUrl)}})
 	_, err = httpClient.Do(req)
 	if err != nil {
