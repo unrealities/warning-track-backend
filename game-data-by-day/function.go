@@ -11,11 +11,14 @@ import (
 	"time"
 
 	"cloud.google.com/go/logging"
+	firebase "firebase.google.com/go"
+	"google.golang.org/api/option"
 )
 
 const (
-	logName   = "get-game-data-by-day"
-	projectID = "warning-track-backend"
+	firebaseAccountKeyPath = ""
+	logName                = "get-game-data-by-day"
+	projectID              = "warning-track-backend"
 )
 
 // LogMessage is a simple struct to ensure JSON formatting in logs
@@ -28,7 +31,7 @@ type LogMessage struct {
 // ex.: https://us-central1-warning-track-backend.cloudfunctions.net/GetGameDataByDay -d {'"date":"03-01-2020"'}
 //
 func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
-	// setup lg
+	// setup logger
 	ctx := context.Background()
 	client, err := logging.NewClient(ctx, projectID)
 	if err != nil {
@@ -36,6 +39,14 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	}
 	defer client.Close()
 	lg := client.Logger(logName)
+
+	// setup connection to Firebase
+	// how to store this file for cloud functions: https://stackoverflow.com/questions/48602546/google-cloud-functions-how-to-securely-store-service-account-private-key-when
+	opt := option.WithCredentialsFile(firebaseAccountKeyPath)
+	_, err = firebase.NewApp(ctx, nil, opt)
+	if err != nil {
+		log.Fatalf("error initializing app: %v", err)
+	}
 
 	var d struct {
 		Date string `json:"date"`
@@ -95,6 +106,8 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	// TODO: Need auth here. Get permission denied without auth.
 	// https://firebase.google.com/docs/auth/admin/create-custom-tokens
 	// https://github.com/firebase/firebase-admin-go/blob/master/snippets/db.go
+	// https://firebase.google.com/docs/admin/setup
+	// Need to generate a privatekey for the service account.
 	lg.Log(logging.Entry{Severity: logging.Debug, Payload: LogMessage{Message: fmt.Sprintf("making Put request to firebase: %s", fbPUTUrl)}})
 	_, err = httpClient.Do(req)
 	if err != nil {
