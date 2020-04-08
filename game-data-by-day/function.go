@@ -36,7 +36,6 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	}
 	defer client.Close()
 	lg := client.Logger(logName)
-
 	var d struct {
 		Date string `json:"date"`
 	}
@@ -92,17 +91,13 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: Need auth here. Get permission denied without auth.
-	// https://firebase.google.com/docs/auth/admin/create-custom-tokens
-	// https://github.com/firebase/firebase-admin-go/blob/master/snippets/db.go
-	// https://firebase.google.com/docs/admin/setup
-	// Need to generate a privatekey for the service account.
 	lg.Log(logging.Entry{Severity: logging.Debug, Payload: LogMessage{Message: fmt.Sprintf("making Put request to firebase: %s", fbPUTUrl)}})
-	_, err = httpClient.Do(req)
+	fbResp, err := httpClient.Do(req)
 	if err != nil {
 		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error trying to make PUT to %s: %s", fbPUTUrl, err)}})
 		return
 	}
+	lg.Log(logging.Entry{Severity: logging.Debug, Payload: LogMessage{Message: fmt.Sprintf("Put response from firebase: %+v", fbResp)}})
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(statsAPIScheduleResp)
