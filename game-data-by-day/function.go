@@ -11,8 +11,6 @@ import (
 	"time"
 
 	"cloud.google.com/go/logging"
-	firebase "firebase.google.com/go"
-	"google.golang.org/api/option"
 )
 
 const (
@@ -29,7 +27,6 @@ type LogMessage struct {
 // GetGameDataByDay returns useful (to Warning-Track) game information for given date
 //
 // ex.: https://us-central1-warning-track-backend.cloudfunctions.net/GetGameDataByDay -d {'"date":"03-01-2020"'}
-//
 func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	// setup logger
 	ctx := context.Background()
@@ -39,14 +36,6 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	}
 	defer client.Close()
 	lg := client.Logger(logName)
-
-	// setup connection to Firebase
-	// how to store this file for cloud functions: https://stackoverflow.com/questions/48602546/google-cloud-functions-how-to-securely-store-service-account-private-key-when
-	opt := option.WithCredentialsFile(firebaseAccountKeyPath)
-	_, err = firebase.NewApp(ctx, nil, opt)
-	if err != nil {
-		log.Fatalf("error initializing app: %v", err)
-	}
 
 	var d struct {
 		Date string `json:"date"`
