@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/logging"
+	firebase "firebase.google.com/go"
 )
 
 const (
@@ -39,6 +40,19 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	var d struct {
 		Date string `json:"date"`
 	}
+
+	// setup Firebase
+	conf := &firebase.Config{
+		DatabaseURL: "https://warning-track-backend.firebaseio.com",
+	}
+
+	// TODO: https://github.com/firebase/firebase-admin-go/blob/master/snippets/db.go
+	_, err = firebase.NewApp(ctx, conf)
+	if err != nil {
+		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error initializing Firebase app: %s", err)}})
+		return
+	}
+
 	if err := json.NewDecoder(r.Body).Decode(&d); err != nil {
 		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error attempting to decode json body: %s", err)}})
 		return
@@ -111,6 +125,20 @@ func firebaseURL(time time.Time) string {
 	day := time.Format("02")
 	year := time.Format("2006")
 	return "https://" + firebaseNamespace + ".firebaseio.com/" + databaseCollection + "/" + month + "-" + day + "-" + year + ".json"
+}
+
+// getReference
+func getReference(ctx context.Context, app *firebase.App) {
+	// Create a database client from App.
+	client, err := app.Database(ctx)
+	if err != nil {
+		log.Fatalln("Error initializing database client:", err)
+	}
+
+	// Get a database reference to our blog.
+	ref := client.NewRef("server/saving-data/fireblog")
+	// [END get_reference]
+	fmt.Println(ref.Path)
 }
 
 // statsAPIScheduleURL returns the URL for all the game schedule data for the given time
