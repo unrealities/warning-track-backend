@@ -40,18 +40,19 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		Date string `json:"date"`
 	}
 
-	// setup Firebase
+	// setup Firebase and Firestore
 	conf := &firebase.Config{DatabaseURL: fmt.Sprintf("https://%s.firebaseio.com", projectID)}
 	app, err := firebase.NewApp(ctx, conf)
 	if err != nil {
 		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error initializing Firebase app: %s", err)}})
 		return
 	}
-	fbClient, err := app.Database(ctx)
+	fsClient, err := app.Firestore(ctx)
 	if err != nil {
-		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error initializing Firebase client: %s", err)}})
+		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error initializing FireStore client: %s", err)}})
 		return
 	}
+	collection := fsClient.Collection(databaseCollection)
 
 	if err := json.NewDecoder(r.Body).Decode(&d); err != nil {
 		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error attempting to decode json body: %s", err)}})
@@ -90,9 +91,8 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Integrate with Firebase to persist data
-	ref := fbClient.NewRef(databaseCollection)
-	err = ref.Child(d.Date).Set(ctx, statsAPIScheduleResp)
+	// Integrate with FireStore to persist data
+	_, err = collection.Doc(d.Date).Set(ctx, statsAPIScheduleResp)
 	if err != nil {
 		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error trying to set value in Firebase: %s", err)}})
 		return
