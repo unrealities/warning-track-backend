@@ -1,7 +1,6 @@
 package function
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -28,17 +27,15 @@ type LogMessage struct {
 //
 // ex.: https://us-central1-warning-track-backend.cloudfunctions.net/GetGameDataByDay -d {'"date":"03-01-2020"'}
 func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
 	// setup logger
-	ctx := context.Background()
 	client, err := logging.NewClient(ctx, projectID)
 	if err != nil {
 		log.Fatalf("error setting up Google Cloud logger")
 	}
 	defer client.Close()
 	lg := client.Logger(logName)
-	var d struct {
-		Date string `json:"date"`
-	}
 
 	// setup Firebase and Firestore
 	conf := &firebase.Config{DatabaseURL: fmt.Sprintf("https://%s.firebaseio.com", projectID)}
@@ -54,6 +51,9 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	}
 	collection := fsClient.Collection(databaseCollection)
 
+	var d struct {
+		Date string `json:"date"`
+	}
 	if err := json.NewDecoder(r.Body).Decode(&d); err != nil {
 		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error attempting to decode json body: %s", err)}})
 		return
