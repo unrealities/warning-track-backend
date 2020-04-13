@@ -53,40 +53,21 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	URL := statsAPIScheduleURL(date)
-	lg.Log(logging.Entry{Severity: logging.Debug, Payload: LogMessage{Message: fmt.Sprintf("making Get request: %s", URL)}})
-	resp, err := http.Get(URL)
+	daySchedule, err := getStatsAPISchedule(date, lg)
 	if err != nil {
-		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error in Get request: %s", err)}})
-		return
-	}
-	defer resp.Body.Close()
-
-	lg.Log(logging.Entry{Severity: logging.Debug, Payload: LogMessage{Message: "parsing response from Get request"}})
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error reading Get response body: %s", err)}})
-		return
-	}
-
-	lg.Log(logging.Entry{Severity: logging.Debug, Payload: LogMessage{Message: "successfully received response from Get"}})
-
-	statsAPIScheduleResp := statsAPISchedule{}
-	err = json.Unmarshal(body, &statsAPIScheduleResp)
-	if err != nil {
-		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error trying to unmarshal response from statsAPI: %s", err)}})
+		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error getting the daily StatsAPI schedule: %s", err)}})
 		return
 	}
 
 	// Integrate with FireStore to persist data
-	_, err = collection.Doc(date.Format(dateFormat)).Set(ctx, statsAPIScheduleResp)
+	_, err = collection.Doc(date.Format(dateFormat)).Set(ctx, daySchedule)
 	if err != nil {
 		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error trying to set value in Firebase: %s", err)}})
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(statsAPIScheduleResp)
+	json.NewEncoder(w).Encode(daySchedule)
 }
 
 // statsAPIScheduleURL returns the URL for all the game schedule data for the given time
@@ -135,4 +116,33 @@ func parseDate(reqBody io.ReadCloser, dateFormat string, lg *logging.Logger) (ti
 	lg.Log(logging.Entry{Severity: logging.Debug, Payload: LogMessage{Message: fmt.Sprintf("date requested: %+v", d.Date)}})
 
 	return time.Parse(dateFormat, d.Date)
+}
+
+func getStatsAPISchedule(date time.Time, lg *logging.Logger) (statsAPISchedule, error) {
+	URL := statsAPIScheduleURL(date)
+	lg.Log(logging.Entry{Severity: logging.Debug, Payload: LogMessage{Message: fmt.Sprintf("making Get request: %s", URL)}})
+	resp, err := http.Get(URL)
+	if err != nil {
+		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error in Get request: %s", err)}})
+		return statsAPISchedule{}, err
+	}
+	defer resp.Body.Close()
+
+	lg.Log(logging.Entry{Severity: logging.Debug, Payload: LogMessage{Message: "parsing response from Get request"}})
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error reading Get response body: %s", err)}})
+		return statsAPISchedule{}, err
+	}
+
+	lg.Log(logging.Entry{Severity: logging.Debug, Payload: LogMessage{Message: "successfully received response from Get"}})
+
+	statsAPIScheduleResp := statsAPISchedule{}
+	err = json.Unmarshal(body, &statsAPIScheduleResp)
+	if err != nil {
+		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error trying to unmarshal response from statsAPI: %s", err)}})
+		return statsAPISchedule{}, err
+	}
+
+	return statsAPIScheduleResp, nil
 }
