@@ -1,5 +1,56 @@
 package function
 
+import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"time"
+
+	"cloud.google.com/go/logging"
+)
+
+// statsAPIScheduleURL returns the URL for all the game schedule data for the given time
+func statsAPIScheduleURL(time time.Time) string {
+	host := "http://statsapi.mlb.com"
+	path := "/api/v1/schedule"
+	query := "?sportId=1&hydrate=game(content(summary,media(epg))),linescore(runners),flags,team&date="
+	month := time.Format("01")
+	day := time.Format("02")
+	year := time.Format("2006")
+	return host + path + query + month + "/" + day + "/" + year
+}
+
+// getStatsAPISchedule returns a statsAPISchedule that contains all the requested day's games
+func getStatsAPISchedule(date time.Time, lg *logging.Logger) (statsAPISchedule, error) {
+	URL := statsAPIScheduleURL(date)
+	lg.Log(logging.Entry{Severity: logging.Debug, Payload: LogMessage{Message: fmt.Sprintf("making Get request: %s", URL)}})
+	resp, err := http.Get(URL)
+	if err != nil {
+		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error in Get request: %s", err)}})
+		return statsAPISchedule{}, err
+	}
+	defer resp.Body.Close()
+
+	lg.Log(logging.Entry{Severity: logging.Debug, Payload: LogMessage{Message: "parsing response from Get request"}})
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error reading Get response body: %s", err)}})
+		return statsAPISchedule{}, err
+	}
+
+	lg.Log(logging.Entry{Severity: logging.Debug, Payload: LogMessage{Message: "successfully received response from Get"}})
+
+	statsAPIScheduleResp := statsAPISchedule{}
+	err = json.Unmarshal(body, &statsAPIScheduleResp)
+	if err != nil {
+		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error trying to unmarshal response from statsAPI: %s", err)}})
+		return statsAPISchedule{}, err
+	}
+
+	return statsAPIScheduleResp, nil
+}
+
 type statsAPISchedule struct {
 	Copyright string `json:"copyright"`
 	Dates     []struct {

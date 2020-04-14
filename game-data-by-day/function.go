@@ -5,14 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
 
-	"cloud.google.com/go/firestore"
 	"cloud.google.com/go/logging"
-	firebase "firebase.google.com/go"
 )
 
 const (
@@ -70,40 +67,6 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(daySchedule)
 }
 
-// statsAPIScheduleURL returns the URL for all the game schedule data for the given time
-func statsAPIScheduleURL(time time.Time) string {
-	host := "http://statsapi.mlb.com"
-	path := "/api/v1/schedule"
-	query := "?sportId=1&hydrate=game(content(summary,media(epg))),linescore(runners),flags,team&date="
-	month := time.Format("01")
-	day := time.Format("02")
-	year := time.Format("2006")
-	return host + path + query + month + "/" + day + "/" + year
-}
-
-// cloudLogger sets up a connection to Google Cloud Logging for the funciton
-func cloudLogger(ctx context.Context, projectID, logName string) (*logging.Logger, error) {
-	client, err := logging.NewClient(ctx, projectID)
-	defer client.Close()
-	return client.Logger(logName), err
-}
-
-// fireStoreCollection sets up a connetion to Firebase and fetches a connection to the desired FireStore collection
-func fireStoreCollection(ctx context.Context, databaseCollection, firebaseDomain, projectID string, lg *logging.Logger) (*firestore.CollectionRef, error) {
-	conf := &firebase.Config{DatabaseURL: fmt.Sprintf("https://%s.%s", projectID, firebaseDomain)}
-	app, err := firebase.NewApp(ctx, conf)
-	if err != nil {
-		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error initializing Firebase app: %s", err)}})
-		return nil, err
-	}
-	fsClient, err := app.Firestore(ctx)
-	if err != nil {
-		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error initializing FireStore client: %s", err)}})
-		return nil, err
-	}
-	return fsClient.Collection(databaseCollection), nil
-}
-
 // parseDate parses the request body and returns a time.Time value of the requested date
 func parseDate(reqBody io.ReadCloser, dateFormat string, lg *logging.Logger) (time.Time, error) {
 	var d struct {
@@ -116,33 +79,4 @@ func parseDate(reqBody io.ReadCloser, dateFormat string, lg *logging.Logger) (ti
 	lg.Log(logging.Entry{Severity: logging.Debug, Payload: LogMessage{Message: fmt.Sprintf("date requested: %+v", d.Date)}})
 
 	return time.Parse(dateFormat, d.Date)
-}
-
-func getStatsAPISchedule(date time.Time, lg *logging.Logger) (statsAPISchedule, error) {
-	URL := statsAPIScheduleURL(date)
-	lg.Log(logging.Entry{Severity: logging.Debug, Payload: LogMessage{Message: fmt.Sprintf("making Get request: %s", URL)}})
-	resp, err := http.Get(URL)
-	if err != nil {
-		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error in Get request: %s", err)}})
-		return statsAPISchedule{}, err
-	}
-	defer resp.Body.Close()
-
-	lg.Log(logging.Entry{Severity: logging.Debug, Payload: LogMessage{Message: "parsing response from Get request"}})
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error reading Get response body: %s", err)}})
-		return statsAPISchedule{}, err
-	}
-
-	lg.Log(logging.Entry{Severity: logging.Debug, Payload: LogMessage{Message: "successfully received response from Get"}})
-
-	statsAPIScheduleResp := statsAPISchedule{}
-	err = json.Unmarshal(body, &statsAPIScheduleResp)
-	if err != nil {
-		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error trying to unmarshal response from statsAPI: %s", err)}})
-		return statsAPISchedule{}, err
-	}
-
-	return statsAPIScheduleResp, nil
 }
