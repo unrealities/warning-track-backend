@@ -1,4 +1,4 @@
-package function
+package gcloud
 
 import (
 	"context"
@@ -9,15 +9,20 @@ import (
 	firebase "firebase.google.com/go"
 )
 
-// cloudLogger sets up a connection to Google Cloud Logging for the funciton
-func cloudLogger(ctx context.Context, projectID, logName string) (*logging.Logger, error) {
+// LogMessage is a simple struct to ensure JSON formatting in logs
+type LogMessage struct {
+	Message string
+}
+
+// CloudLogger sets up a connection to Google Cloud Logging for the funciton
+func CloudLogger(ctx context.Context, projectID, logName string) (*logging.Logger, error) {
 	client, err := logging.NewClient(ctx, projectID)
 	defer client.Close()
 	return client.Logger(logName), err
 }
 
-// fireStoreCollection sets up a connetion to Firebase and fetches a connection to the desired FireStore collection
-func fireStoreCollection(ctx context.Context, databaseCollection, firebaseDomain, projectID string, lg *logging.Logger) (*firestore.CollectionRef, error) {
+// FireStoreCollection sets up a connetion to Firebase and fetches a connection to the desired FireStore collection
+func FireStoreCollection(ctx context.Context, databaseCollection, firebaseDomain, projectID string, lg *logging.Logger) (*firestore.CollectionRef, error) {
 	conf := &firebase.Config{DatabaseURL: fmt.Sprintf("https://%s.%s", projectID, firebaseDomain)}
 	app, err := firebase.NewApp(ctx, conf)
 	if err != nil {

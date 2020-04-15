@@ -10,6 +10,8 @@ import (
 	"time"
 
 	"cloud.google.com/go/logging"
+	"github.com/unrealities/warning-track-backend/game-data-by-day/gcloud"
+	"github.com/unrealities/warning-track-backend/game-data-by-day/mlbStats"
 )
 
 const (
@@ -21,11 +23,6 @@ const (
 	projectID          = "warning-track-backend"
 )
 
-// LogMessage is a simple struct to ensure JSON formatting in logs
-type LogMessage struct {
-	Message string
-}
-
 // GetGameDataByDay returns useful (to Warning-Track) game information for given date
 //
 // ex.: https://us-central1-warning-track-backend.cloudfunctions.net/GetGameDataByDay -d {'"date":"03-01-2020"'}
@@ -33,33 +30,33 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), duration)
 	defer cancel()
 
-	lg, err := cloudLogger(ctx, projectID, logName)
+	lg, err := gcloud.CloudLogger(ctx, projectID, logName)
 	if err != nil {
 		log.Fatalf("error setting up Google Cloud logger")
 	}
 
-	collection, err := fireStoreCollection(ctx, databaseCollection, firebaseDomain, projectID, lg)
+	collection, err := gcloud.FireStoreCollection(ctx, databaseCollection, firebaseDomain, projectID, lg)
 	if err != nil {
-		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error setting up connection to FireStore: %s", err)}})
+		lg.Log(logging.Entry{Severity: logging.Error, Payload: gcloud.LogMessage{Message: fmt.Sprintf("error setting up connection to FireStore: %s", err)}})
 		return
 	}
 
 	date, err := parseDate(r.Body, dateFormat, lg)
 	if err != nil {
-		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error parsing date requested: %s", err)}})
+		lg.Log(logging.Entry{Severity: logging.Error, Payload: gcloud.LogMessage{Message: fmt.Sprintf("error parsing date requested: %s", err)}})
 		return
 	}
 
-	daySchedule, err := getStatsAPISchedule(date, lg)
+	daySchedule, err := mlbStats.GetSchedule(date, lg)
 	if err != nil {
-		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error getting the daily StatsAPI schedule: %s", err)}})
+		lg.Log(logging.Entry{Severity: logging.Error, Payload: gcloud.LogMessage{Message: fmt.Sprintf("error getting the daily StatsAPI schedule: %s", err)}})
 		return
 	}
 
 	// Integrate with FireStore to persist data
 	_, err = collection.Doc(date.Format(dateFormat)).Set(ctx, daySchedule)
 	if err != nil {
-		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error trying to set value in Firebase: %s", err)}})
+		lg.Log(logging.Entry{Severity: logging.Error, Payload: gcloud.LogMessage{Message: fmt.Sprintf("error trying to set value in Firebase: %s", err)}})
 		return
 	}
 
@@ -73,10 +70,10 @@ func parseDate(reqBody io.ReadCloser, dateFormat string, lg *logging.Logger) (ti
 		Date string `json:"date"`
 	}
 	if err := json.NewDecoder(reqBody).Decode(&d); err != nil {
-		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error attempting to decode json body: %s", err)}})
+		lg.Log(logging.Entry{Severity: logging.Error, Payload: gcloud.LogMessage{Message: fmt.Sprintf("error attempting to decode json body: %s", err)}})
 		return time.Time{}, err
 	}
-	lg.Log(logging.Entry{Severity: logging.Debug, Payload: LogMessage{Message: fmt.Sprintf("date requested: %+v", d.Date)}})
+	lg.Log(logging.Entry{Severity: logging.Debug, Payload: gcloud.LogMessage{Message: fmt.Sprintf("date requested: %+v", d.Date)}})
 
 	return time.Parse(dateFormat, d.Date)
 }
