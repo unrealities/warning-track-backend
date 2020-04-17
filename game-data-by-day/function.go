@@ -10,6 +10,9 @@ import (
 	"time"
 
 	"cloud.google.com/go/logging"
+	"contrib.go.opencensus.io/exporter/stackdriver"
+	"go.opencensus.io/trace"
+
 	"github.com/unrealities/warning-track-backend/game-data-by-day/gcloud"
 	"github.com/unrealities/warning-track-backend/game-data-by-day/mlbStats"
 )
@@ -35,6 +38,13 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		firebaseDomain: "firebaseio.com",
 		projectID:      "warning-track-backend",
 	}
+
+	// Create and register a OpenCensus Stackdriver Trace exporter.
+	exporter, err := stackdriver.NewExporter(stackdriver.Options{ProjectID: gameDataByDay.projectID})
+	if err != nil {
+		log.Fatalf("error setting up OpenCensus Stackdriver Trace exporter")
+	}
+	trace.RegisterExporter(exporter)
 
 	ctx, cancel := context.WithTimeout(r.Context(), gameDataByDay.duration)
 	defer cancel()
