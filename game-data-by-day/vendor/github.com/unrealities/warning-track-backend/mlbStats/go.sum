@@ -104,6 +104,8 @@ github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81P
 github.com/unrealities/warning-track-backend v0.0.0-20200418204501-7fed367f9b9e h1:uOloAAihWAh1JmB1vgTRy7WDz5LQTQn9Wza8vr/qBDE=
 github.com/unrealities/warning-track-backend/gCloud v0.0.4 h1:y2F0jT24T8xg0Ga0xUg4CxVT8l9jqPpHabrz3/S/V8E=
 github.com/unrealities/warning-track-backend/gCloud v0.0.4/go.mod h1:/LL0rQtO6fDmdlD7JOcwYP+T+RMQ3eP4lnzMIXv4PXQ=
+github.com/unrealities/warning-track-backend/gCloud v0.0.5 h1:InwG75mbfQEC9LfD8BdTYPY0OvOXqMo9u7trzM7lo2c=
+github.com/unrealities/warning-track-backend/gCloud v0.0.5/go.mod h1:/LL0rQtO6fDmdlD7JOcwYP+T+RMQ3eP4lnzMIXv4PXQ=
 github.com/unrealities/warning-track-backend/game-data-by-day v0.0.0-20200418204501-7fed367f9b9e h1:ZPd83ulMR6CbJeLWxyo3byhuhDX/NjuixgV5xCIbNbU=
 github.com/unrealities/warning-track-backend/game-data-by-day v0.0.0-20200418204501-7fed367f9b9e/go.mod h1:xllqFJT0rZ7zzsINbncLugFNdECoKEhJ4glVs302A6M=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
