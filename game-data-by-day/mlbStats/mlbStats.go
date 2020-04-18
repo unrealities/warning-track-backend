@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/logging"
-	"github.com/unrealities/warning-track-backend/game-data-by-day/gcloud"
+	"github.com/unrealities/warning-track-backend/game-data-by-day/gCloud"
 )
 
 // statsAPIScheduleURL returns the URL for all the game schedule data for the given time
@@ -25,27 +25,27 @@ func statsAPIScheduleURL(time time.Time) string {
 // GetSchedule returns a Schedule that contains all the requested day's games
 func GetSchedule(date time.Time, lg *logging.Logger) (Schedule, error) {
 	URL := statsAPIScheduleURL(date)
-	lg.Log(logging.Entry{Severity: logging.Debug, Payload: gcloud.LogMessage{Message: fmt.Sprintf("making Get request: %s", URL)}})
+	lg.Log(logging.Entry{Severity: logging.Debug, Payload: gCloud.LogMessage{Message: fmt.Sprintf("making Get request: %s", URL)}})
 	resp, err := http.Get(URL)
 	if err != nil {
-		lg.Log(logging.Entry{Severity: logging.Error, Payload: gcloud.LogMessage{Message: fmt.Sprintf("error in Get request: %s", err)}})
+		lg.Log(logging.Entry{Severity: logging.Error, Payload: gCloud.LogMessage{Message: fmt.Sprintf("error in Get request: %s", err)}})
 		return Schedule{}, err
 	}
 	defer resp.Body.Close()
 
-	lg.Log(logging.Entry{Severity: logging.Debug, Payload: gcloud.LogMessage{Message: "parsing response from Get request"}})
+	lg.Log(logging.Entry{Severity: logging.Debug, Payload: gCloud.LogMessage{Message: "parsing response from Get request"}})
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		lg.Log(logging.Entry{Severity: logging.Error, Payload: gcloud.LogMessage{Message: fmt.Sprintf("error reading Get response body: %s", err)}})
+		lg.Log(logging.Entry{Severity: logging.Error, Payload: gCloud.LogMessage{Message: fmt.Sprintf("error reading Get response body: %s", err)}})
 		return Schedule{}, err
 	}
 
-	lg.Log(logging.Entry{Severity: logging.Debug, Payload: gcloud.LogMessage{Message: "successfully received response from Get"}})
+	lg.Log(logging.Entry{Severity: logging.Debug, Payload: gCloud.LogMessage{Message: "successfully received response from Get"}})
 
 	statsAPIScheduleResp := Schedule{}
 	err = json.Unmarshal(body, &statsAPIScheduleResp)
 	if err != nil {
-		lg.Log(logging.Entry{Severity: logging.Error, Payload: gcloud.LogMessage{Message: fmt.Sprintf("error trying to unmarshal response from statsAPI: %s", err)}})
+		lg.Log(logging.Entry{Severity: logging.Error, Payload: gCloud.LogMessage{Message: fmt.Sprintf("error trying to unmarshal response from statsAPI: %s", err)}})
 		return Schedule{}, err
 	}
 

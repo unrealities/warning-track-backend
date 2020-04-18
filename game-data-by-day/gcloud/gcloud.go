@@ -1,4 +1,4 @@
-package gcloud
+package gCloud
 
 import (
 	"context"
