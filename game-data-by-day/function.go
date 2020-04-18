@@ -46,7 +46,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	}
 	trace.RegisterExporter(exporter)
 
-	ctx, cancel := context.WithTimeout(r.Context(), gameDataByDay.duration)
+	ctx, cancel := context.WithTimeout(context.Background(), gameDataByDay.duration)
 	defer cancel()
 
 	lg, err := gCloud.CloudLogger(ctx, gameDataByDay.projectID, fmt.Sprintf("get-%s", gameDataByDay.dbCollection))
