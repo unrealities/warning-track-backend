@@ -31,6 +31,8 @@ type gameDataByDay struct {
 // ex. POST request:
 // https://us-central1-warning-track-backend.cloudfunctions.net/GetGameDataByDay -d {"date":"03-01-2020"}
 func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
+	log.Printf("Received a request: %+v", r)
+
 	gameDataByDay := gameDataByDay{
 		dateFmt:        "01-02-2006",
 		dbCollection:   "game-data-by-day",
@@ -61,7 +63,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	date, err := parseDate(r.Body, gameDataByDay.dateFmt, gameDataByDay.logger)
+	date, err := parseDate(r.Body, gameDataByDay.dateFmt)
 	if err != nil {
 		lg.Log(logging.Entry{Severity: logging.Error, Payload: gCloud.LogMessage{Message: fmt.Sprintf("error parsing date requested: %s", err)}})
 		return
@@ -85,15 +87,13 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 }
 
 // parseDate parses the request body and returns a time.Time value of the requested date
-func parseDate(reqBody io.ReadCloser, dateFormat string, lg *logging.Logger) (time.Time, error) {
+func parseDate(reqBody io.ReadCloser, dateFormat string) (time.Time, error) {
 	var d struct {
 		Date string `json:"date"`
 	}
 	if err := json.NewDecoder(reqBody).Decode(&d); err != nil {
-		lg.Log(logging.Entry{Severity: logging.Error, Payload: gCloud.LogMessage{Message: fmt.Sprintf("error attempting to decode json body: %s", err)}})
 		return time.Time{}, err
 	}
-	lg.Log(logging.Entry{Severity: logging.Debug, Payload: gCloud.LogMessage{Message: fmt.Sprintf("date requested: %+v", d.Date)}})
 
 	return time.Parse(dateFormat, d.Date)
 }
