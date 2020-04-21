@@ -38,7 +38,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		duration:       60 * time.Second,
 		firebaseDomain: "firebaseio.com",
 		projectID:      "warning-track-backend",
-		version:        "v0.0.32",
+		version:        "v0.0.33",
 	}
 	log.Printf("running version: %s", gameDataByDay.version)
 
@@ -77,8 +77,8 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// TODO: Problem here
-	r, err = collection.Doc(date.Format(gameDataByDay.dateFmt)).Set(ctx, daySchedule)
-	lg.Printf("received response from setting the collection: %+v", r)
+	res, err := collection.Doc(date.Format(gameDataByDay.dateFmt)).Set(ctx, daySchedule)
+	log.Printf("received response from setting the collection: %+v", res)
 	if err != nil {
 		log.Fatalf("error persisting data to firestore: %s", err)
 		lg.Log(logging.Entry{Severity: logging.Error, Payload: gCloud.LogMessage{Message: fmt.Sprintf("error trying to set value in Firebase: %s", err)}})
