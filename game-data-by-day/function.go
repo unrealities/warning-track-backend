@@ -32,19 +32,14 @@ type gameDataByDay struct {
 // ex. POST request:
 // https://us-central1-warning-track-backend.cloudfunctions.net/GetGameDataByDay -d {"date":"03-01-2020"}
 func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
-	log.Printf("received a request: %+v", r)
-
 	gameDataByDay := gameDataByDay{
 		dateFmt:        "01-02-2006",
 		dbCollection:   "game-data-by-day",
 		duration:       60 * time.Second,
 		firebaseDomain: "firebaseio.com",
 		projectID:      "warning-track-backend",
-		version:        "v0.0.31",
+		version:        "v0.0.32",
 	}
-
-	log.Printf("gameDataByDay: %+v", gameDataByDay)
-
 	log.Printf("running version: %s", gameDataByDay.version)
 
 	// Create and register a OpenCensus Stackdriver Trace exporter.
@@ -54,23 +49,14 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	}
 	trace.RegisterExporter(exporter)
 
-	log.Printf("successfully registered trace exporter: %+v", exporter)
-
 	ctx, cancel := context.WithTimeout(r.Context(), gameDataByDay.duration)
 	defer cancel()
-
-	log.Printf("successfully set context: %+v", ctx)
 
 	lg, err := gCloud.CloudLogger(ctx, gameDataByDay.projectID, fmt.Sprintf("get-%s", gameDataByDay.dbCollection))
 	if err != nil {
 		log.Fatalf("error setting up Google Cloud logger")
 	}
-
-	log.Printf("succesffuly connected to Google Cloud Logger: %+v", lg)
-
 	gameDataByDay.logger = lg
-
-	log.Printf("successfully registered logger in gameDataByDay: %+v", gameDataByDay)
 
 	collection, err := gCloud.FireStoreCollection(ctx, gameDataByDay.dbCollection, gameDataByDay.firebaseDomain, gameDataByDay.projectID, gameDataByDay.logger)
 	if err != nil {
@@ -78,15 +64,11 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("successfully fetched collection: %+v", collection)
-
 	date, err := parseDate(r.Body, gameDataByDay.dateFmt)
 	if err != nil {
 		lg.Log(logging.Entry{Severity: logging.Error, Payload: gCloud.LogMessage{Message: fmt.Sprintf("error parsing date requested: %s", err)}})
 		return
 	}
-
-	log.Printf("successfully parsed date: %+v", date)
 
 	daySchedule, err := mlbStats.GetSchedule(date, gameDataByDay.logger)
 	if err != nil {
@@ -94,10 +76,11 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println("successfully fetched daySchedule")
-
-	_, err = collection.Doc(date.Format(gameDataByDay.dateFmt)).Set(ctx, daySchedule)
+	// TODO: Problem here
+	r, err = collection.Doc(date.Format(gameDataByDay.dateFmt)).Set(ctx, daySchedule)
+	lg.Printf("received response from setting the collection: %+v", r)
 	if err != nil {
+		log.Fatalf("error persisting data to firestore: %s", err)
 		lg.Log(logging.Entry{Severity: logging.Error, Payload: gCloud.LogMessage{Message: fmt.Sprintf("error trying to set value in Firebase: %s", err)}})
 		return
 	}
