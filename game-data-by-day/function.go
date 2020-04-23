@@ -39,7 +39,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		duration:       60 * time.Second,
 		firebaseDomain: "firebaseio.com",
 		projectID:      "warning-track-backend",
-		version:        "v0.0.35",
+		version:        "v0.0.36",
 	}
 	log.Printf("running version: %s", gameDataByDay.version)
 
@@ -77,8 +77,12 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Printf("collection: %+v", collection)
+	doc := collection.Doc(date.Format(gameDataByDay.dateFmt))
+	log.Printf("doc: %+v", doc)
+
 	// TODO: Problem here
-	res, err := collection.Doc(date.Format(gameDataByDay.dateFmt)).Set(ctx, daySchedule)
+	res, err := doc.Set(ctx, daySchedule)
 	log.Printf("received response from setting the collection: %+v", res)
 	if err != nil {
 		log.Fatalf("error persisting data to firestore: %s", err)
