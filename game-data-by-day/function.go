@@ -39,7 +39,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		duration:       60 * time.Second,
 		firebaseDomain: "firebaseio.com",
 		projectID:      "warning-track-backend",
-		version:        "v0.0.36",
+		version:        "v0.0.37",
 	}
 	log.Printf("running version: %s", gameDataByDay.version)
 
@@ -82,6 +82,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	log.Printf("doc: %+v", doc)
 
 	// TODO: Problem here
+	// Could it just be an out of memory issue? Try up'ing to 256MB
 	res, err := doc.Set(ctx, daySchedule)
 	log.Printf("received response from setting the collection: %+v", res)
 	if err != nil {
