@@ -39,7 +39,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		duration:       60 * time.Second,
 		firebaseDomain: "firebaseio.com",
 		projectID:      "warning-track-backend",
-		version:        "v0.0.37",
+		version:        "v0.0.38",
 	}
 	log.Printf("running version: %s", gameDataByDay.version)
 
@@ -82,9 +82,8 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	log.Printf("doc: %+v", doc)
 
 	// TODO: Problem here
-	// Could it just be an out of memory issue? Try up'ing to 256MB
-	res, err := doc.Set(ctx, daySchedule)
-	log.Printf("received response from setting the collection: %+v", res)
+	_, err = doc.Set(ctx, daySchedule)
+	log.Printf("received response from setting the collection")
 	if err != nil {
 		log.Fatalf("error persisting data to firestore: %s", err)
 		lg.Log(logging.Entry{Severity: logging.Error, Payload: LogMessage{Message: fmt.Sprintf("error trying to set value in Firebase: %s", err)}})
@@ -94,7 +93,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	log.Println("successfully persisted data")
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(daySchedule)
+	json.NewEncoder(w).Encode(daySchedule.TotalGames)
 }
 
 // parseDate parses the request body and returns a time.Time value of the requested date
