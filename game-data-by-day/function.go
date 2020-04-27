@@ -38,7 +38,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		duration:       60 * time.Second,
 		firebaseDomain: "firebaseio.com",
 		projectID:      "warning-track-backend",
-		version:        "v0.0.39",
+		version:        "v0.0.40",
 	}
 	log.Printf("running version: %s", gameDataByDay.version)
 
