@@ -49,7 +49,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		firebaseDomain: "firebaseio.com",
 		projectID:      "warning-track-backend",
 		functionName:   "GetGameDataByDay",
-		version:        "v0.0.41",
+		version:        "v0.0.42",
 	}
 	log.Printf("running version: %s", gameDataByDay.version)
 
