@@ -1,6 +1,7 @@
 package function
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -8,12 +9,13 @@ import (
 	"net/http"
 	"time"
 
+	"cloud.google.com/go/errorreporting"
+	"cloud.google.com/go/firestore"
 	"cloud.google.com/go/logging"
 	"contrib.go.opencensus.io/exporter/stackdriver"
+	firebase "firebase.google.com/go"
 	"go.opencensus.io/trace"
-	"golang.org/x/net/context"
 
-	"github.com/unrealities/warning-track-backend/gCloud"
 	"github.com/unrealities/warning-track-backend/mlbStats"
 )
 
@@ -22,10 +24,18 @@ type gameDataByDay struct {
 	dateFmt        string
 	dbCollection   string
 	duration       time.Duration
+	errorReporter  *errorreporting.Client
 	firebaseDomain string
+	functionName   string
 	logger         *logging.Logger
 	projectID      string
 	version        string
+}
+
+// logMessage is a simple struct to ensure JSON formatting in logs
+type logMessage struct {
+	err string
+	msg string
 }
 
 // GetGameDataByDay returns useful (to Warning-Track) game information for given date
@@ -38,60 +48,82 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		duration:       60 * time.Second,
 		firebaseDomain: "firebaseio.com",
 		projectID:      "warning-track-backend",
-		version:        "v0.0.40",
+		functionName:   "GetGameDataByDay",
+		version:        "v0.0.41",
 	}
 	log.Printf("running version: %s", gameDataByDay.version)
+
+	var err error
+	ctx := context.Background()
 
 	// Create and register a OpenCensus Stackdriver Trace exporter.
 	exporter, err := stackdriver.NewExporter(stackdriver.Options{ProjectID: gameDataByDay.projectID})
 	if err != nil {
-		log.Fatalf("error setting up OpenCensus Stackdriver Trace exporter")
+		log.Fatalf("error setting up OpenCensus Stackdriver Trace exporter: %s", err)
 	}
 	trace.RegisterExporter(exporter)
 
-	ctx := context.Background()
-
-	lg, err := gCloud.CloudLogger(ctx, gameDataByDay.projectID, fmt.Sprintf("get-%s", gameDataByDay.dbCollection))
+	// Error Reporting
+	errorClient, err := errorreporting.NewClient(ctx, gameDataByDay.projectID, errorreporting.Config{
+		ServiceName:    gameDataByDay.functionName,
+		ServiceVersion: gameDataByDay.version,
+		OnError: func(err error) {
+			log.Printf("Could not log error: %v", err)
+		},
+	})
 	if err != nil {
-		log.Fatalf("error setting up Google Cloud logger")
+		log.Fatalf("error setting up Error Reporting: %s", err)
 	}
-	gameDataByDay.logger = lg
+	defer errorClient.Close()
+	gameDataByDay.errorReporter = errorClient
 
-	collection, err := gCloud.FireStoreCollection(ctx, gameDataByDay.dbCollection, gameDataByDay.firebaseDomain, gameDataByDay.projectID, gameDataByDay.logger)
+	// Cloud Logging
+	logClient, err := logging.NewClient(ctx, gameDataByDay.projectID)
+	if err := logClient.Close(); err != nil {
+		log.Fatalf("error setting up Google Cloud logger: %s", err)
+	}
+	defer logClient.Close()
+	gameDataByDay.logger = logClient.Logger(gameDataByDay.functionName)
+
+	collection, err := fireStoreCollection(ctx, gameDataByDay.dbCollection, gameDataByDay.firebaseDomain, gameDataByDay.projectID)
 	if err != nil {
-		lg.Log(logging.Entry{Severity: logging.Error, Payload: gCloud.LogMessage{Message: fmt.Sprintf("error setting up connection to FireStore: %s", err)}})
-		return
+		gameDataByDay.handleFatalError("error setting up connection to FireStore", err)
 	}
 
 	date, err := parseDate(r.Body, gameDataByDay.dateFmt)
 	if err != nil {
-		lg.Log(logging.Entry{Severity: logging.Error, Payload: gCloud.LogMessage{Message: fmt.Sprintf("error parsing date requested: %s", err)}})
-		return
+		gameDataByDay.handleFatalError("error parsing date requested", err)
 	}
 
 	daySchedule, err := mlbStats.GetSchedule(date, gameDataByDay.logger)
 	if err != nil {
-		lg.Log(logging.Entry{Severity: logging.Error, Payload: gCloud.LogMessage{Message: fmt.Sprintf("error getting the daily StatsAPI schedule: %s", err)}})
-		return
+		gameDataByDay.handleFatalError("error getting the daily StatsAPI schedule", err)
 	}
 
-	log.Printf("collection: %+v", collection)
-	doc := collection.Doc(date.Format(gameDataByDay.dateFmt))
-	log.Printf("doc: %+v", doc)
-
-	// TODO: Problem here
-	_, err = doc.Set(ctx, daySchedule)
+	_, err = collection.Doc(date.Format(gameDataByDay.dateFmt)).Set(ctx, daySchedule)
 	log.Printf("received response from setting the collection")
 	if err != nil {
-		log.Fatalf("error persisting data to firestore: %s", err)
-		lg.Log(logging.Entry{Severity: logging.Error, Payload: gCloud.LogMessage{Message: fmt.Sprintf("error trying to set value in Firebase: %s", err)}})
-		return
+		gameDataByDay.handleFatalError("error persisting data to Firebase", err)
 	}
 
 	log.Println("successfully persisted data")
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(daySchedule.TotalGames)
+}
+
+// FireStoreCollection sets up a connetion to Firebase and fetches a connection to the desired FireStore collection
+func fireStoreCollection(ctx context.Context, databaseCollection, firebaseDomain, projectID string) (*firestore.CollectionRef, error) {
+	conf := &firebase.Config{DatabaseURL: fmt.Sprintf("https://%s.%s", projectID, firebaseDomain)}
+	app, err := firebase.NewApp(ctx, conf)
+	if err != nil {
+		return nil, err
+	}
+	fsClient, err := app.Firestore(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return fsClient.Collection(databaseCollection), nil
 }
 
 // parseDate parses the request body and returns a time.Time value of the requested date
@@ -104,4 +136,10 @@ func parseDate(reqBody io.ReadCloser, dateFormat string) (time.Time, error) {
 	}
 
 	return time.Parse(dateFormat, d.Date)
+}
+
+func (g gameDataByDay) handleFatalError(msg string, err error) {
+	g.errorReporter.Report(errorreporting.Entry{})
+	g.logger.Log(logging.Entry{Severity: logging.Error, Payload: logMessage{msg: msg, err: err.Error()}})
+	log.Fatalf("%s: %s", msg, err)
 }

@@ -17,9 +17,7 @@ type LogMessage struct {
 // CloudLogger sets up a connection to Google Cloud Logging for the funciton
 func CloudLogger(ctx context.Context, projectID, logName string) (*logging.Logger, error) {
 	client, err := logging.NewClient(ctx, projectID)
-	if err := client.Close(); err != nil {
-		return nil, fmt.Errorf("Failed to close client: %v", err)
-	}
+	defer client.Close()
 	return client.Logger(logName), err
 }
 
