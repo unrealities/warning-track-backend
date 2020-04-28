@@ -101,15 +101,12 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, err = collection.Doc(date.Format(gameDataByDay.dateFmt)).Set(ctx, daySchedule)
-	log.Printf("received response from setting the collection")
 	if err != nil {
 		gameDataByDay.handleFatalError("error persisting data to Firebase", err)
 	}
 
-	log.Println("successfully persisted data")
-
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(daySchedule.TotalGames)
+	json.NewEncoder(w).Encode(daySchedule)
 }
 
 // FireStoreCollection sets up a connetion to Firebase and fetches a connection to the desired FireStore collection
