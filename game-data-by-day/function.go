@@ -13,7 +13,9 @@ import (
 	"cloud.google.com/go/errorreporting"
 	"cloud.google.com/go/firestore"
 	"cloud.google.com/go/logging"
+	"contrib.go.opencensus.io/exporter/stackdriver"
 	firebase "firebase.google.com/go"
+	"go.opencensus.io/trace"
 
 	"github.com/unrealities/warning-track-backend/mlbStats"
 )
@@ -49,33 +51,33 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		ProjectID:    "warning-track-backend",
 		FunctionName: "GetGameDataByDay",
 		Timeout:      60 * time.Second,
-		Version:      "v0.0.59",
+		Version:      "v0.0.60",
 	}
 	log.Printf("running version: %s", gameDataByDay.Version)
 
 	var err error
 	ctx := context.Background()
 
-	// // Tracing
-	// exporter, err := stackdriver.NewExporter(stackdriver.Options{ProjectID: gameDataByDay.ProjectID})
-	// if err != nil {
-	// 	log.Fatalf("error setting up OpenCensus Stackdriver Trace exporter: %s", err)
-	// }
-	// trace.RegisterExporter(exporter)
+	// Tracing
+	exporter, err := stackdriver.NewExporter(stackdriver.Options{ProjectID: gameDataByDay.ProjectID})
+	if err != nil {
+		log.Fatalf("error setting up OpenCensus Stackdriver Trace exporter: %s", err)
+	}
+	trace.RegisterExporter(exporter)
 
-	// // Error Reporting
-	// errorClient, err := errorreporting.NewClient(ctx, gameDataByDay.ProjectID, errorreporting.Config{
-	// 	ServiceName:    gameDataByDay.FunctionName,
-	// 	ServiceVersion: gameDataByDay.Version,
-	// 	OnError: func(err error) {
-	// 		log.Printf("Could not log error: %v", err)
-	// 	},
-	// })
-	// if err != nil {
-	// 	log.Fatalf("error setting up Error Reporting: %s", err)
-	// }
-	// defer errorClient.Close()
-	// gameDataByDay.ErrorReporter = errorClient
+	// Error Reporting
+	errorClient, err := errorreporting.NewClient(ctx, gameDataByDay.ProjectID, errorreporting.Config{
+		ServiceName:    gameDataByDay.FunctionName,
+		ServiceVersion: gameDataByDay.Version,
+		OnError: func(err error) {
+			log.Printf("Could not log error: %v", err)
+		},
+	})
+	if err != nil {
+		log.Fatalf("error setting up Error Reporting: %s", err)
+	}
+	defer errorClient.Close()
+	gameDataByDay.ErrorReporter = errorClient
 
 	// Cloud Logging
 	logClient, err := logging.NewClient(ctx, gameDataByDay.ProjectID)
@@ -139,7 +141,7 @@ func parseDate(reqBody io.ReadCloser, dateFormat string) (time.Time, error) {
 // HandleFatalError produces an error report, cloud log message and standard log fatal
 // TODO: include tracing (Trace in logging.Entry)
 func (g GameDataByDay) HandleFatalError(msg string, err error) {
-	// g.errorReporter.Report(errorreporting.Entry{Error: err})
+	g.ErrorReporter.Report(errorreporting.Entry{Error: err})
 	g.Logger.Logger(g.FunctionName).Log(logging.Entry{
 		Severity: logging.Error,
 		Payload: LogMessage{
