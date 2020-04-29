@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -48,9 +49,9 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		projectID:    "warning-track-backend",
 		functionName: "GetGameDataByDay",
 		timeout:      60 * time.Second,
-		version:      "v0.0.55",
+		version:      "v0.0.56",
 	}
-	fmt.Printf("running version: %s", gameDataByDay.version)
+	log.Printf("running version: %s", gameDataByDay.version)
 
 	var err error
 	ctx := context.Background()
@@ -78,17 +79,14 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 
 	// Cloud Logging
 	logClient, err := logging.NewClient(ctx, gameDataByDay.projectID)
-	if err := logClient.Close(); err != nil {
-		fmt.Printf("error setting up Google Cloud logger: %s", err)
-		return
+	if err != nil {
+		log.Fatalf("error setting up Google Cloud logger: %s", err)
 	}
 	defer logClient.Close()
 	logClient.OnError = func(e error) {
 		fmt.Fprintf(os.Stderr, "logClient error: %v", e)
 	}
 	gameDataByDay.logger = logClient
-
-	gameDataByDay.debugMsg("successfully initialized metrics")
 
 	// Firestore
 	conf := &firebase.Config{ProjectID: gameDataByDay.projectID}
@@ -115,13 +113,11 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	}
 	gameDataByDay.debugMsg("successfully fetched schedule")
 
-	// log.Printf("daySchedule.Dates[0].Games[0].GameNumber: %v", daySchedule.Dates[0].Games[0].GameNumber)
+	log.Printf("daySchedule.Dates[0].Games[0].GameNumber: %v", daySchedule.Dates[0].Games[0].GameNumber)
 	_, err = collection.Doc(date.Format(gameDataByDay.dateFmt)).Set(ctx, daySchedule.Dates[0].Games[0])
 	if err != nil {
 		gameDataByDay.handleFatalError("error persisting data to Firebase", err)
 	}
-
-	gameDataByDay.debugMsg("successful run")
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(daySchedule.Dates[0].Games[0])
@@ -143,27 +139,27 @@ func parseDate(reqBody io.ReadCloser, dateFormat string) (time.Time, error) {
 // TODO: include tracing (Trace in logging.Entry)
 func (g gameDataByDay) handleFatalError(msg string, err error) {
 	// g.errorReporter.Report(errorreporting.Entry{Error: err})
-	g.logger.Logger(g.functionName).Log(logging.Entry{
-		Severity: logging.Error,
-		Payload: logMessage{
-			msg:      msg,
-			err:      err.Error(),
-			function: g.functionName,
-			version:  g.version,
-		},
-	})
-	// log.Fatalf("%s: %s", msg, err)
+	// g.logger.Logger(g.functionName).Log(logging.Entry{
+	// 	Severity: logging.Error,
+	// 	Payload: logMessage{
+	// 		msg:      msg,
+	// 		err:      err.Error(),
+	// 		function: g.functionName,
+	// 		version:  g.version,
+	// 	},
+	// })
+	log.Fatalf("%s: %s", msg, err)
 }
 
 // debugMsg logs a simple debug message with function name and version
 func (g gameDataByDay) debugMsg(msg string) {
-	g.logger.Logger(g.functionName).Log(logging.Entry{
-		Severity: logging.Debug,
-		Payload: logMessage{
-			msg:      msg,
-			function: g.functionName,
-			version:  g.version,
-		},
-	})
-	// log.Println(msg)
+	// g.logger.Logger(g.functionName).Log(logging.Entry{
+	// 	Severity: logging.Debug,
+	// 	Payload: logMessage{
+	// 		msg:      msg,
+	// 		function: g.functionName,
+	// 		version:  g.version,
+	// 	},
+	// })
+	log.Println(msg)
 }
