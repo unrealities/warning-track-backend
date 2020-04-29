@@ -3,7 +3,6 @@ package function
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -21,15 +20,15 @@ import (
 
 // gameDataByDay stores necessary information for the cloud function
 type gameDataByDay struct {
-	dateFmt        string
-	dbCollection   string
-	errorReporter  *errorreporting.Client
-	firebaseDomain string
-	functionName   string
-	logger         *logging.Client
-	projectID      string
-	timeout        time.Duration
-	version        string
+	dateFmt         string
+	dbCollection    string
+	errorReporter   *errorreporting.Client
+	firestoreClient *firestore.Client
+	functionName    string
+	logger          *logging.Client
+	projectID       string
+	timeout         time.Duration
+	version         string
 }
 
 // logMessage is a simple struct to ensure JSON formatting in logs
@@ -45,20 +44,19 @@ type logMessage struct {
 // https://us-central1-warning-track-backend.cloudfunctions.net/GetGameDataByDay -d {"date":"03-01-2020"}
 func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	gameDataByDay := gameDataByDay{
-		dateFmt:        "01-02-2006",
-		dbCollection:   "game-data-by-day",
-		firebaseDomain: "firebaseio.com",
-		projectID:      "warning-track-backend",
-		functionName:   "GetGameDataByDay",
-		timeout:        60 * time.Second,
-		version:        "v0.0.51",
+		dateFmt:      "01-02-2006",
+		dbCollection: "game-data-by-day",
+		projectID:    "warning-track-backend",
+		functionName: "GetGameDataByDay",
+		timeout:      60 * time.Second,
+		version:      "v0.0.52",
 	}
 	log.Printf("running version: %s", gameDataByDay.version)
 
 	var err error
 	ctx := context.Background()
 
-	// Create and register a OpenCensus Stackdriver Trace exporter.
+	// Tracing
 	exporter, err := stackdriver.NewExporter(stackdriver.Options{ProjectID: gameDataByDay.projectID})
 	if err != nil {
 		log.Fatalf("error setting up OpenCensus Stackdriver Trace exporter: %s", err)
@@ -89,10 +87,19 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 
 	gameDataByDay.debugMsg("successfully initialized metrics")
 
-	collection, err := fireStoreCollection(ctx, gameDataByDay.dbCollection, gameDataByDay.firebaseDomain, gameDataByDay.projectID)
+	// Firestore
+	conf := &firebase.Config{ProjectID: gameDataByDay.projectID}
+	app, err := firebase.NewApp(ctx, conf)
 	if err != nil {
-		gameDataByDay.handleFatalError("error setting up connection to FireStore", err)
+		gameDataByDay.handleFatalError("error setting up Firebase app", err)
 	}
+	fsClient, err := app.Firestore(ctx)
+	if err != nil {
+		gameDataByDay.handleFatalError("error setting up Firestore client", err)
+	}
+	collection := fsClient.Collection(gameDataByDay.dbCollection)
+
+	gameDataByDay.debugMsg("successfully fetched Firestore collection")
 
 	date, err := parseDate(r.Body, gameDataByDay.dateFmt)
 	if err != nil {
@@ -125,20 +132,6 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(daySchedule.Dates[0].Games[0])
-}
-
-// FireStoreCollection sets up a connetion to Firebase and fetches a connection to the desired FireStore collection
-func fireStoreCollection(ctx context.Context, databaseCollection, firebaseDomain, projectID string) (*firestore.CollectionRef, error) {
-	conf := &firebase.Config{DatabaseURL: fmt.Sprintf("https://%s.%s", projectID, firebaseDomain)}
-	app, err := firebase.NewApp(ctx, conf)
-	if err != nil {
-		return nil, err
-	}
-	fsClient, err := app.Firestore(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return fsClient.Collection(databaseCollection), nil
 }
 
 // parseDate parses the request body and returns a time.Time value of the requested date
