@@ -33,10 +33,10 @@ type GameDataByDay struct {
 
 // LogMessage is a simple struct to ensure JSON formatting in logs
 type LogMessage struct {
-	Err      string
-	Function string
-	Msg      string
-	Version  string
+	Err      string `json:",omitempty"`
+	Function string `json:"fn"`
+	Msg      string `json:"msg"`
+	Version  string `json:"version"`
 }
 
 // GetGameDataByDay returns useful (to Warning-Track) game information for given date
@@ -49,7 +49,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		ProjectID:    "warning-track-backend",
 		FunctionName: "GetGameDataByDay",
 		Timeout:      60 * time.Second,
-		Version:      "v0.0.57",
+		Version:      "v0.0.58",
 	}
 	log.Printf("running version: %s", gameDataByDay.Version)
 
@@ -122,11 +122,13 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	logClient.Logger(gameDataByDay.FunctionName).Log(logging.Entry{
 		Severity: logging.Debug,
 		Payload: LogMessage{
-			Msg:      "stackdrive success",
+			Msg:      "stackdriver success",
 			Function: gameDataByDay.FunctionName,
 			Version:  gameDataByDay.Version,
 		},
 	})
+
+	gameDataByDay.DebugMsg("stackdriver debug message success")
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(daySchedule.Dates[0].Games[0])
@@ -160,15 +162,15 @@ func (g GameDataByDay) HandleFatalError(msg string, err error) {
 	log.Fatalf("%s: %s", msg, err)
 }
 
-// debugMsg logs a simple debug message with function name and version
+// DebugMsg logs a simple debug message with function name and version
 func (g GameDataByDay) DebugMsg(msg string) {
-	// g.logger.Logger(g.FunctionName).Log(logging.Entry{
-	// 	Severity: logging.Debug,
-	// 	Payload: logMessage{
-	// 		Msg:      msg,
-	// 		Function: g.FunctionName,
-	// 		Version:  g.Version,
-	// 	},
-	// })
+	g.Logger.Logger(g.FunctionName).Log(logging.Entry{
+		Severity: logging.Debug,
+		Payload: LogMessage{
+			Msg:      msg,
+			Function: g.FunctionName,
+			Version:  g.Version,
+		},
+	})
 	log.Println(msg)
 }
