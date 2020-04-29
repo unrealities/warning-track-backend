@@ -51,7 +51,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		firebaseDomain: "firebaseio.com",
 		projectID:      "warning-track-backend",
 		functionName:   "GetGameDataByDay",
-		version:        "v0.0.43",
+		version:        "v0.0.44",
 	}
 	log.Printf("running version: %s", gameDataByDay.version)
 
@@ -84,24 +84,30 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	if err := logClient.Close(); err != nil {
 		log.Fatalf("error setting up Google Cloud logger: %s", err)
 	}
+	defer logClient.Close()
 	gameDataByDay.logger = logClient.Logger(gameDataByDay.functionName)
 
+	log.Printf("succesfully initialized metrics")
 	gameDataByDay.debugMsg("successfully initialized metrics")
 
 	collection, err := fireStoreCollection(ctx, gameDataByDay.dbCollection, gameDataByDay.firebaseDomain, gameDataByDay.projectID)
 	if err != nil {
 		gameDataByDay.handleFatalError("error setting up connection to FireStore", err)
 	}
+	log.Printf("succesfully fetched firestore collection")
 
 	date, err := parseDate(r.Body, gameDataByDay.dateFmt)
 	if err != nil {
 		gameDataByDay.handleFatalError("error parsing date requested", err)
 	}
+	log.Printf("succesfully parsed date")
 
 	daySchedule, err := mlbStats.GetSchedule(date, gameDataByDay.logger)
 	if err != nil {
 		gameDataByDay.handleFatalError("error getting the daily StatsAPI schedule", err)
 	}
+	log.Printf("succesfully fetched schedule")
+	gameDataByDay.debugMsg("successfully fetched schedule")
 
 	_, err = collection.Doc(date.Format(gameDataByDay.dateFmt)).Set(ctx, daySchedule)
 	if err != nil {
@@ -111,6 +117,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(daySchedule)
 
+	log.Printf("successful run")
 	gameDataByDay.debugMsg("successful run")
 
 	// prevent panic and close logger
