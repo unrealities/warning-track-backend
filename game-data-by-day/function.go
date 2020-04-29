@@ -23,12 +23,12 @@ import (
 type gameDataByDay struct {
 	dateFmt        string
 	dbCollection   string
-	duration       time.Duration
 	errorReporter  *errorreporting.Client
 	firebaseDomain string
 	functionName   string
-	logger         *logging.Logger
+	logger         *logging.Client
 	projectID      string
+	timeout        time.Duration
 	version        string
 }
 
@@ -47,11 +47,11 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	gameDataByDay := gameDataByDay{
 		dateFmt:        "01-02-2006",
 		dbCollection:   "game-data-by-day",
-		duration:       60 * time.Second,
 		firebaseDomain: "firebaseio.com",
 		projectID:      "warning-track-backend",
 		functionName:   "GetGameDataByDay",
-		version:        "v0.0.48",
+		timeout:        60 * time.Second,
+		version:        "v0.0.50",
 	}
 	log.Printf("running version: %s", gameDataByDay.version)
 
@@ -85,7 +85,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("error setting up Google Cloud logger: %s", err)
 	}
 	defer logClient.Close()
-	gameDataByDay.logger = logClient.Logger(gameDataByDay.functionName)
+	gameDataByDay.logger = logClient
 
 	gameDataByDay.debugMsg("successfully initialized metrics")
 
@@ -99,7 +99,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		gameDataByDay.handleFatalError("error parsing date requested", err)
 	}
 
-	daySchedule, err := mlbStats.GetSchedule(date, gameDataByDay.logger)
+	daySchedule, err := mlbStats.GetSchedule(date)
 	if err != nil {
 		gameDataByDay.handleFatalError("error getting the daily StatsAPI schedule", err)
 	}
@@ -117,11 +117,11 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	gameDataByDay.debugMsg("successful run")
 
 	// prevent panic and close logger
-	err = gameDataByDay.logger.Flush()
+	err = gameDataByDay.logger.Logger(gameDataByDay.functionName).Flush()
 	if err != nil {
 		log.Fatalf("error tring to flush cloud logger: %s", err)
 	}
-	err = logClient.Close()
+	err = gameDataByDay.logger.Close()
 	if err != nil {
 		log.Fatalf("error tring to close cloud logger client: %s", err)
 	}
@@ -157,7 +157,7 @@ func parseDate(reqBody io.ReadCloser, dateFormat string) (time.Time, error) {
 // TODO: include tracing (Trace in logging.Entry)
 func (g gameDataByDay) handleFatalError(msg string, err error) {
 	g.errorReporter.Report(errorreporting.Entry{Error: err})
-	g.logger.Log(logging.Entry{
+	g.logger.Logger(g.functionName).Log(logging.Entry{
 		Severity: logging.Error,
 		Payload: logMessage{
 			msg:      msg,
@@ -171,7 +171,7 @@ func (g gameDataByDay) handleFatalError(msg string, err error) {
 
 // debugMsg logs a simple debug message with function name and version
 func (g gameDataByDay) debugMsg(msg string) {
-	g.logger.Log(logging.Entry{
+	g.logger.Logger(g.functionName).Log(logging.Entry{
 		Severity: logging.Debug,
 		Payload: logMessage{
 			msg:      msg,
