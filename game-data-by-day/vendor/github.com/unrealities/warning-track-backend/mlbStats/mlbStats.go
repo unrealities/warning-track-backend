@@ -6,9 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"time"
-
-	"cloud.google.com/go/logging"
-	"github.com/unrealities/warning-track-backend/gCloud"
 )
 
 // statsAPIScheduleURL returns the URL for all the game schedule data for the given time
@@ -23,35 +20,29 @@ func statsAPIScheduleURL(time time.Time) string {
 }
 
 // GetSchedule returns a Schedule that contains all the requested day's games
-func GetSchedule(date time.Time, lg *logging.Logger) (Schedule, error) {
+func GetSchedule(date time.Time) (Schedule, error) {
 	URL := statsAPIScheduleURL(date)
-	lg.Log(logging.Entry{Severity: logging.Debug, Payload: gCloud.LogMessage{Message: fmt.Sprintf("making Get request: %s", URL)}})
 	resp, err := http.Get(URL)
 	if err != nil {
-		lg.Log(logging.Entry{Severity: logging.Error, Payload: gCloud.LogMessage{Message: fmt.Sprintf("error in Get request: %s", err)}})
-		return Schedule{}, err
+		return Schedule{}, fmt.Errorf("mlbStats#GetSchedule: Get %s, error: %s", URL, err)
 	}
 	defer resp.Body.Close()
 
-	lg.Log(logging.Entry{Severity: logging.Debug, Payload: gCloud.LogMessage{Message: "parsing response from Get request"}})
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		lg.Log(logging.Entry{Severity: logging.Error, Payload: gCloud.LogMessage{Message: fmt.Sprintf("error reading Get response body: %s", err)}})
-		return Schedule{}, err
+		return Schedule{}, fmt.Errorf("mlbStats#GetSchedule: reading Get response body error: %s", err)
 	}
-
-	lg.Log(logging.Entry{Severity: logging.Debug, Payload: gCloud.LogMessage{Message: "successfully received response from Get"}})
 
 	statsAPIScheduleResp := Schedule{}
 	err = json.Unmarshal(body, &statsAPIScheduleResp)
 	if err != nil {
-		lg.Log(logging.Entry{Severity: logging.Error, Payload: gCloud.LogMessage{Message: fmt.Sprintf("error trying to unmarshal response from statsAPI: %s", err)}})
-		return Schedule{}, err
+		return Schedule{}, fmt.Errorf("mlbStats#GetSchedule: unmarshal error: %s", err)
 	}
 
 	return statsAPIScheduleResp, nil
 }
 
+// Schedule is the format of the json returned from statsAPIScheduleURL
 type Schedule struct {
 	Copyright string `json:"copyright"`
 	Dates     []struct {

@@ -105,9 +105,7 @@ github.com/jmespath/go-jmespath
 github.com/jstemmer/go-junit-report
 github.com/jstemmer/go-junit-report/formatter
 github.com/jstemmer/go-junit-report/parser
-# github.com/unrealities/warning-track-backend/gCloud v0.0.5
-github.com/unrealities/warning-track-backend/gCloud
-# github.com/unrealities/warning-track-backend/mlbStats v0.0.5
+# github.com/unrealities/warning-track-backend/mlbStats v0.1.0
 github.com/unrealities/warning-track-backend/mlbStats
 # go.opencensus.io v0.22.3
 go.opencensus.io
