@@ -34,8 +34,10 @@ type gameDataByDay struct {
 
 // logMessage is a simple struct to ensure JSON formatting in logs
 type logMessage struct {
-	err string
-	msg string
+	err      string
+	function string
+	msg      string
+	version  string
 }
 
 // GetGameDataByDay returns useful (to Warning-Track) game information for given date
@@ -49,7 +51,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		firebaseDomain: "firebaseio.com",
 		projectID:      "warning-track-backend",
 		functionName:   "GetGameDataByDay",
-		version:        "v0.0.42",
+		version:        "v0.0.43",
 	}
 	log.Printf("running version: %s", gameDataByDay.version)
 
@@ -82,8 +84,9 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	if err := logClient.Close(); err != nil {
 		log.Fatalf("error setting up Google Cloud logger: %s", err)
 	}
-	defer logClient.Close()
 	gameDataByDay.logger = logClient.Logger(gameDataByDay.functionName)
+
+	gameDataByDay.debugMsg("successfully initialized metrics")
 
 	collection, err := fireStoreCollection(ctx, gameDataByDay.dbCollection, gameDataByDay.firebaseDomain, gameDataByDay.projectID)
 	if err != nil {
@@ -107,6 +110,18 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(daySchedule)
+
+	gameDataByDay.debugMsg("successful run")
+
+	// prevent panic and close logger
+	err = gameDataByDay.logger.Flush()
+	if err != nil {
+		log.Fatalf("error tring to flush cloud logger: %s", err)
+	}
+	err = logClient.Close()
+	if err != nil {
+		log.Fatalf("error tring to close cloud logger client: %s", err)
+	}
 }
 
 // FireStoreCollection sets up a connetion to Firebase and fetches a connection to the desired FireStore collection
@@ -135,8 +150,30 @@ func parseDate(reqBody io.ReadCloser, dateFormat string) (time.Time, error) {
 	return time.Parse(dateFormat, d.Date)
 }
 
+// handleFatalError produces an error report, cloud log message and standard log fatal
+// TODO: include tracing (Trace in logging.Entry)
 func (g gameDataByDay) handleFatalError(msg string, err error) {
 	g.errorReporter.Report(errorreporting.Entry{})
-	g.logger.Log(logging.Entry{Severity: logging.Error, Payload: logMessage{msg: msg, err: err.Error()}})
+	g.logger.Log(logging.Entry{
+		Severity: logging.Error,
+		Payload: logMessage{
+			msg:      msg,
+			err:      err.Error(),
+			function: g.functionName,
+			version:  g.version,
+		},
+	})
 	log.Fatalf("%s: %s", msg, err)
+}
+
+// debugMsg logs a simple debug message with function name and version
+func (g gameDataByDay) debugMsg(msg string) {
+	g.logger.Log(logging.Entry{
+		Severity: logging.Debug,
+		Payload: logMessage{
+			msg:      msg,
+			function: g.functionName,
+			version:  g.version,
+		},
+	})
 }
