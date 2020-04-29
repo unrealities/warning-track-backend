@@ -49,7 +49,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		ProjectID:    "warning-track-backend",
 		FunctionName: "GetGameDataByDay",
 		Timeout:      60 * time.Second,
-		Version:      "v0.0.58",
+		Version:      "v0.0.59",
 	}
 	log.Printf("running version: %s", gameDataByDay.Version)
 
@@ -113,25 +113,15 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	}
 	gameDataByDay.DebugMsg("successfully fetched schedule")
 
-	log.Printf("daySchedule.Dates[0].Games[0].GameNumber: %v", daySchedule.Dates[0].Games[0].GameNumber)
-	_, err = collection.Doc(date.Format(gameDataByDay.DateFmt)).Set(ctx, daySchedule.Dates[0].Games[0])
+	_, err = collection.Doc(date.Format(gameDataByDay.DateFmt)).Set(ctx, daySchedule)
 	if err != nil {
 		gameDataByDay.HandleFatalError("error persisting data to Firebase", err)
 	}
 
-	logClient.Logger(gameDataByDay.FunctionName).Log(logging.Entry{
-		Severity: logging.Debug,
-		Payload: LogMessage{
-			Msg:      "stackdriver success",
-			Function: gameDataByDay.FunctionName,
-			Version:  gameDataByDay.Version,
-		},
-	})
-
 	gameDataByDay.DebugMsg("stackdriver debug message success")
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(daySchedule.Dates[0].Games[0])
+	json.NewEncoder(w).Encode(daySchedule)
 }
 
 // parseDate parses the request body and returns a time.Time value of the requested date
@@ -150,15 +140,15 @@ func parseDate(reqBody io.ReadCloser, dateFormat string) (time.Time, error) {
 // TODO: include tracing (Trace in logging.Entry)
 func (g GameDataByDay) HandleFatalError(msg string, err error) {
 	// g.errorReporter.Report(errorreporting.Entry{Error: err})
-	// g.logger.Logger(g.FunctionName).Log(logging.Entry{
-	// 	Severity: logging.Error,
-	// 	Payload: logMessage{
-	// 		Msg:      msg,
-	// 		Err:      err.Error(),
-	// 		Function: g.FunctionName,
-	// 		Version:  g.Version,
-	// 	},
-	// })
+	g.Logger.Logger(g.FunctionName).Log(logging.Entry{
+		Severity: logging.Error,
+		Payload: LogMessage{
+			Msg:      msg,
+			Err:      err.Error(),
+			Function: g.FunctionName,
+			Version:  g.Version,
+		},
+	})
 	log.Fatalf("%s: %s", msg, err)
 }
 
@@ -172,5 +162,4 @@ func (g GameDataByDay) DebugMsg(msg string) {
 			Version:  g.Version,
 		},
 	})
-	log.Println(msg)
 }
