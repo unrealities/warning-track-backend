@@ -51,7 +51,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		firebaseDomain: "firebaseio.com",
 		projectID:      "warning-track-backend",
 		functionName:   "GetGameDataByDay",
-		version:        "v0.0.47",
+		version:        "v0.0.48",
 	}
 	log.Printf("running version: %s", gameDataByDay.version)
 
@@ -87,30 +87,26 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	defer logClient.Close()
 	gameDataByDay.logger = logClient.Logger(gameDataByDay.functionName)
 
-	log.Printf("succesfully initialized metrics")
 	gameDataByDay.debugMsg("successfully initialized metrics")
 
 	collection, err := fireStoreCollection(ctx, gameDataByDay.dbCollection, gameDataByDay.firebaseDomain, gameDataByDay.projectID)
 	if err != nil {
 		gameDataByDay.handleFatalError("error setting up connection to FireStore", err)
 	}
-	log.Printf("succesfully fetched firestore collection")
 
 	date, err := parseDate(r.Body, gameDataByDay.dateFmt)
 	if err != nil {
 		gameDataByDay.handleFatalError("error parsing date requested", err)
 	}
-	log.Printf("succesfully parsed date")
 
 	daySchedule, err := mlbStats.GetSchedule(date, gameDataByDay.logger)
 	if err != nil {
 		gameDataByDay.handleFatalError("error getting the daily StatsAPI schedule", err)
 	}
-	log.Printf("succesfully fetched schedule")
 	gameDataByDay.debugMsg("successfully fetched schedule")
 
-	log.Printf("daySchedule.TotalEvents: %d", daySchedule.TotalGames)
-	_, err = collection.Doc(date.Format(gameDataByDay.dateFmt)).Set(ctx, daySchedule.TotalGames)
+	log.Printf("daySchedule.TotalEvents: %v", daySchedule.Dates[0].Games[0].GameNumber)
+	_, err = collection.Doc(date.Format(gameDataByDay.dateFmt)).Set(ctx, daySchedule.Dates[0].Games[0])
 	if err != nil {
 		gameDataByDay.handleFatalError("error persisting data to Firebase", err)
 	}
@@ -118,7 +114,6 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(daySchedule)
 
-	log.Printf("successful run")
 	gameDataByDay.debugMsg("successful run")
 
 	// prevent panic and close logger
@@ -184,4 +179,5 @@ func (g gameDataByDay) debugMsg(msg string) {
 			version:  g.version,
 		},
 	})
+	log.Println(msg)
 }
