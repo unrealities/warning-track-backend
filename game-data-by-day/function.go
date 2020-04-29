@@ -51,7 +51,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		firebaseDomain: "firebaseio.com",
 		projectID:      "warning-track-backend",
 		functionName:   "GetGameDataByDay",
-		version:        "v0.0.44",
+		version:        "v0.0.46",
 	}
 	log.Printf("running version: %s", gameDataByDay.version)
 
@@ -109,7 +109,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	log.Printf("succesfully fetched schedule")
 	gameDataByDay.debugMsg("successfully fetched schedule")
 
-	_, err = collection.Doc(date.Format(gameDataByDay.dateFmt)).Set(ctx, daySchedule)
+	_, err = collection.Doc(date.Format(gameDataByDay.dateFmt)).Set(ctx, daySchedule.TotalEvents)
 	if err != nil {
 		gameDataByDay.handleFatalError("error persisting data to Firebase", err)
 	}
