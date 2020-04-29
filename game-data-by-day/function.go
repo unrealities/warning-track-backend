@@ -51,7 +51,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		projectID:      "warning-track-backend",
 		functionName:   "GetGameDataByDay",
 		timeout:        60 * time.Second,
-		version:        "v0.0.50",
+		version:        "v0.0.51",
 	}
 	log.Printf("running version: %s", gameDataByDay.version)
 
@@ -105,14 +105,11 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	}
 	gameDataByDay.debugMsg("successfully fetched schedule")
 
-	log.Printf("daySchedule.TotalEvents: %v", daySchedule.Dates[0].Games[0].GameNumber)
+	log.Printf("daySchedule.Dates[0].Games[0].GameNumber: %v", daySchedule.Dates[0].Games[0].GameNumber)
 	_, err = collection.Doc(date.Format(gameDataByDay.dateFmt)).Set(ctx, daySchedule.Dates[0].Games[0])
 	if err != nil {
 		gameDataByDay.handleFatalError("error persisting data to Firebase", err)
 	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(daySchedule)
 
 	gameDataByDay.debugMsg("successful run")
 
@@ -125,6 +122,9 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatalf("error tring to close cloud logger client: %s", err)
 	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(daySchedule.Dates[0].Games[0])
 }
 
 // FireStoreCollection sets up a connetion to Firebase and fetches a connection to the desired FireStore collection
