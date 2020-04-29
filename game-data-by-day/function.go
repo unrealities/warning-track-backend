@@ -51,7 +51,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		firebaseDomain: "firebaseio.com",
 		projectID:      "warning-track-backend",
 		functionName:   "GetGameDataByDay",
-		version:        "v0.0.46",
+		version:        "v0.0.47",
 	}
 	log.Printf("running version: %s", gameDataByDay.version)
 
@@ -109,7 +109,8 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	log.Printf("succesfully fetched schedule")
 	gameDataByDay.debugMsg("successfully fetched schedule")
 
-	_, err = collection.Doc(date.Format(gameDataByDay.dateFmt)).Set(ctx, daySchedule.TotalEvents)
+	log.Printf("daySchedule.TotalEvents: %d", daySchedule.TotalGames)
+	_, err = collection.Doc(date.Format(gameDataByDay.dateFmt)).Set(ctx, daySchedule.TotalGames)
 	if err != nil {
 		gameDataByDay.handleFatalError("error persisting data to Firebase", err)
 	}
@@ -160,7 +161,7 @@ func parseDate(reqBody io.ReadCloser, dateFormat string) (time.Time, error) {
 // handleFatalError produces an error report, cloud log message and standard log fatal
 // TODO: include tracing (Trace in logging.Entry)
 func (g gameDataByDay) handleFatalError(msg string, err error) {
-	g.errorReporter.Report(errorreporting.Entry{})
+	g.errorReporter.Report(errorreporting.Entry{Error: err})
 	g.logger.Log(logging.Entry{
 		Severity: logging.Error,
 		Payload: logMessage{
