@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"time"
@@ -49,9 +48,9 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		projectID:    "warning-track-backend",
 		functionName: "GetGameDataByDay",
 		timeout:      60 * time.Second,
-		version:      "v0.0.54",
+		version:      "v0.0.55",
 	}
-	log.Printf("running version: %s", gameDataByDay.version)
+	fmt.Printf("running version: %s", gameDataByDay.version)
 
 	var err error
 	ctx := context.Background()
@@ -80,7 +79,8 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	// Cloud Logging
 	logClient, err := logging.NewClient(ctx, gameDataByDay.projectID)
 	if err := logClient.Close(); err != nil {
-		log.Fatalf("error setting up Google Cloud logger: %s", err)
+		fmt.Printf("error setting up Google Cloud logger: %s", err)
+		return
 	}
 	defer logClient.Close()
 	logClient.OnError = func(e error) {
@@ -115,7 +115,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	}
 	gameDataByDay.debugMsg("successfully fetched schedule")
 
-	log.Printf("daySchedule.Dates[0].Games[0].GameNumber: %v", daySchedule.Dates[0].Games[0].GameNumber)
+	// log.Printf("daySchedule.Dates[0].Games[0].GameNumber: %v", daySchedule.Dates[0].Games[0].GameNumber)
 	_, err = collection.Doc(date.Format(gameDataByDay.dateFmt)).Set(ctx, daySchedule.Dates[0].Games[0])
 	if err != nil {
 		gameDataByDay.handleFatalError("error persisting data to Firebase", err)
@@ -152,7 +152,7 @@ func (g gameDataByDay) handleFatalError(msg string, err error) {
 			version:  g.version,
 		},
 	})
-	log.Fatalf("%s: %s", msg, err)
+	// log.Fatalf("%s: %s", msg, err)
 }
 
 // debugMsg logs a simple debug message with function name and version
@@ -165,5 +165,5 @@ func (g gameDataByDay) debugMsg(msg string) {
 			version:  g.version,
 		},
 	})
-	log.Println(msg)
+	// log.Println(msg)
 }
