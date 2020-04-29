@@ -1,7 +1,6 @@
 package function
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -29,7 +28,7 @@ type GameDataByDay struct {
 	FunctionName    string
 	Logger          *logging.Client
 	ProjectID       string
-	Timeout         time.Duration
+	TraceSpan       *trace.Span
 	Version         string
 }
 
@@ -46,17 +45,13 @@ type LogMessage struct {
 // https://us-central1-warning-track-backend.cloudfunctions.net/GetGameDataByDay -d {"date":"03-01-2020"}
 func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	gameDataByDay := GameDataByDay{
-		DateFmt:      "01-02-2006",
-		DbCollection: "game-data-by-day",
-		ProjectID:    "warning-track-backend",
-		FunctionName: "GetGameDataByDay",
-		Timeout:      60 * time.Second,
-		Version:      "v0.0.60",
+		DateFmt:      os.Getenv("DATE_FMT"),
+		DbCollection: os.Getenv("DB_COLLECTION"),
+		ProjectID:    os.Getenv("PROJECT_ID"),
+		FunctionName: os.Getenv("FN_NAME"),
+		Version:      os.Getenv("VERSION"),
 	}
 	log.Printf("running version: %s", gameDataByDay.Version)
-
-	var err error
-	ctx := context.Background()
 
 	// Tracing
 	exporter, err := stackdriver.NewExporter(stackdriver.Options{ProjectID: gameDataByDay.ProjectID})
@@ -64,6 +59,8 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("error setting up OpenCensus Stackdriver Trace exporter: %s", err)
 	}
 	trace.RegisterExporter(exporter)
+	ctx, span := trace.StartSpan(r.Context(), gameDataByDay.FunctionName)
+	gameDataByDay.TraceSpan = span
 
 	// Error Reporting
 	errorClient, err := errorreporting.NewClient(ctx, gameDataByDay.ProjectID, errorreporting.Config{
@@ -139,10 +136,10 @@ func parseDate(reqBody io.ReadCloser, dateFormat string) (time.Time, error) {
 }
 
 // HandleFatalError produces an error report, cloud log message and standard log fatal
-// TODO: include tracing (Trace in logging.Entry)
 func (g GameDataByDay) HandleFatalError(msg string, err error) {
 	g.ErrorReporter.Report(errorreporting.Entry{Error: err})
 	g.Logger.Logger(g.FunctionName).Log(logging.Entry{
+		LogName:  g.FunctionName,
 		Severity: logging.Error,
 		Payload: LogMessage{
 			Msg:      msg,
@@ -150,6 +147,8 @@ func (g GameDataByDay) HandleFatalError(msg string, err error) {
 			Function: g.FunctionName,
 			Version:  g.Version,
 		},
+		Trace:  fmt.Sprintf("projects/%s/trace/%s", g.ProjectID, g.TraceSpan.SpanContext().TraceID.String()),
+		SpanID: g.TraceSpan.SpanContext().SpanID.String(),
 	})
 	log.Fatalf("%s: %s", msg, err)
 }
@@ -157,6 +156,7 @@ func (g GameDataByDay) HandleFatalError(msg string, err error) {
 // DebugMsg logs a simple debug message with function name and version
 func (g GameDataByDay) DebugMsg(msg string) {
 	g.Logger.Logger(g.FunctionName).Log(logging.Entry{
+		LogName:  g.FunctionName,
 		Severity: logging.Debug,
 		Payload: LogMessage{
 			Msg:      msg,
