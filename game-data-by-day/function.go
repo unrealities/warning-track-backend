@@ -3,9 +3,11 @@ package function
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"cloud.google.com/go/errorreporting"
@@ -47,7 +49,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		projectID:    "warning-track-backend",
 		functionName: "GetGameDataByDay",
 		timeout:      60 * time.Second,
-		version:      "v0.0.53",
+		version:      "v0.0.54",
 	}
 	log.Printf("running version: %s", gameDataByDay.version)
 
@@ -75,16 +77,16 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	// defer errorClient.Close()
 	// gameDataByDay.errorReporter = errorClient
 
-	// // Cloud Logging
-	// logClient, err := logging.NewClient(ctx, gameDataByDay.projectID)
-	// if err := logClient.Close(); err != nil {
-	// 	log.Fatalf("error setting up Google Cloud logger: %s", err)
-	// }
-	// defer logClient.Close()
-	// logClient.OnError = func(e error) {
-	// 	fmt.Fprintf(os.Stderr, "logClient error: %v", e)
-	// }
-	// gameDataByDay.logger = logClient
+	// Cloud Logging
+	logClient, err := logging.NewClient(ctx, gameDataByDay.projectID)
+	if err := logClient.Close(); err != nil {
+		log.Fatalf("error setting up Google Cloud logger: %s", err)
+	}
+	defer logClient.Close()
+	logClient.OnError = func(e error) {
+		fmt.Fprintf(os.Stderr, "logClient error: %v", e)
+	}
+	gameDataByDay.logger = logClient
 
 	gameDataByDay.debugMsg("successfully initialized metrics")
 
@@ -141,27 +143,27 @@ func parseDate(reqBody io.ReadCloser, dateFormat string) (time.Time, error) {
 // TODO: include tracing (Trace in logging.Entry)
 func (g gameDataByDay) handleFatalError(msg string, err error) {
 	// g.errorReporter.Report(errorreporting.Entry{Error: err})
-	// g.logger.Logger(g.functionName).Log(logging.Entry{
-	// 	Severity: logging.Error,
-	// 	Payload: logMessage{
-	// 		msg:      msg,
-	// 		err:      err.Error(),
-	// 		function: g.functionName,
-	// 		version:  g.version,
-	// 	},
-	// })
+	g.logger.Logger(g.functionName).Log(logging.Entry{
+		Severity: logging.Error,
+		Payload: logMessage{
+			msg:      msg,
+			err:      err.Error(),
+			function: g.functionName,
+			version:  g.version,
+		},
+	})
 	log.Fatalf("%s: %s", msg, err)
 }
 
 // debugMsg logs a simple debug message with function name and version
 func (g gameDataByDay) debugMsg(msg string) {
-	// g.logger.Logger(g.functionName).Log(logging.Entry{
-	// 	Severity: logging.Debug,
-	// 	Payload: logMessage{
-	// 		msg:      msg,
-	// 		function: g.functionName,
-	// 		version:  g.version,
-	// 	},
-	// })
+	g.logger.Logger(g.functionName).Log(logging.Entry{
+		Severity: logging.Debug,
+		Payload: logMessage{
+			msg:      msg,
+			function: g.functionName,
+			version:  g.version,
+		},
+	})
 	log.Println(msg)
 }
