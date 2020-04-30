@@ -13,14 +13,17 @@
     "args": [ 
       "functions",
       "deploy",
-      "${_FUNCTION_NAME}",
+      "GetGameDataByDay",
       "--runtime", 
       "go113",
       "--entry-point",
-      "#{_FUNCTION_NAME}",
+      "GetGameDataByDay",
+      "--memory",
+      "128MB",
       "--allow-unauthenticated",
       "--trigger-http" ],
     "dir": "functions/autodeploy",
+    "timeout": "5s",
     "env": [
       "DATE_FMT=${_DATE_FMT}",
       "DB_COLLECTION=${_DB_COLLECTION}",
@@ -32,6 +35,6 @@
   "substitutions": {
     "_DATE_FMT": "01-02-2006",
     "_DB_COLLECTION": "game-data-by-day",
-    "_FUNCTION_NAME": "GameDataByDay"
+    "_FUNCTION_NAME": "GetGameDataByDay"
   }
 }
