@@ -11,7 +11,7 @@
   {
     "name": "gcr.io/cloud-builders/gcloud",
     "args": [ 
-      "functions", "deploy", "GetGameDataByDay",
+      "functions", "deploy", "${_FUNCTION_NAME}",
       "--entry-point", "${_FUNCTION_NAME}",
       "--max-instances", "1",
       "--memory", "128MB",
