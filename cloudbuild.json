@@ -1,0 +1,28 @@
+{
+  "steps": [{
+    "name": "mirror.gcr.io/library/golang",
+    "args": [ "go", "version" ]
+  },
+  {
+    "name": "mirror.gcr.io/library/golang",
+    "args": [ "go", "version" ],
+    "dir": "fucntions/autodeploy"
+  },
+  {
+    "name": "gcr.io/cloud-builders/gcloud",
+    "args": [ "functions", "deploy", "${_FUNCTION_NAME}", "--trigger-http", "--runtime", "go113", "--entry-point", "gameDataByDay/GameDataByDay"],
+    "dir": "functions/autodeploy",
+    "env": [
+      "DATE_FMT=${_DATE_FMT}",
+      "DB_COLLECTION=${_DB_COLLECTION}",
+      "FN_NAME=${_FUNCTION_NAME}",
+      "PROJECT_ID=$PROJECT_ID",
+      "VERSION=$REVISION_ID"
+    ]
+  }],
+  "substitutions": {
+    "_DATE_FMT": "01-02-2006",
+    "_DB_COLLECTION": "game-data-by-day",
+    "_FUNCTION_NAME": "GameDataByDay"
+  }
+}
