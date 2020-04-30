@@ -10,7 +10,14 @@
   },
   {
     "name": "gcr.io/cloud-builders/gcloud",
-    "args": [ "functions", "deploy", "${_FUNCTION_NAME}", "--trigger-http", "--runtime", "go113", "--entry-point", "gameDataByDay/GameDataByDay"],
+    "args": [ 
+      "functions",
+      "deploy",
+      "${_FUNCTION_NAME}",
+      "--runtime", 
+      "go113",
+      "--allow-unauthenticated",
+      "--trigger-http" ],
     "dir": "functions/autodeploy",
     "env": [
       "DATE_FMT=${_DATE_FMT}",
