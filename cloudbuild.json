@@ -6,7 +6,7 @@
   {
     "name": "mirror.gcr.io/library/golang",
     "args": [ "go", "version" ],
-    "dir": "fucntions/autodeploy"
+    "dir": "functions/autodeploy"
   },
   {
     "name": "gcr.io/cloud-builders/gcloud",
