@@ -18,7 +18,7 @@
       "--runtime", "go113",
       "--service-account", "firebase-adminsdk-t8pqz@warning-track-backend.iam.gserviceaccount.com",
       "--set-env-vars", "DATE_FMT=${_DATE_FMT},DB_COLLECTION=${_DB_COLLECTION},FN_NAME=${_FUNCTION_NAME},PROJECT_ID=$PROJECT_ID,VERSION=$COMMIT_SHA",
-      "--source", "https://source.developers.google.com/projects/warning-track-backend/repos/github_unrealities_warning-track-backend/moveable-aliases/master/paths/game-data-by-day",
+      "--source", "https://source.cloud.google.com/warning-track-backend/github_unrealities_warning-track-backend/+/master:",
       "--timeout", "5s",
       "--allow-unauthenticated",
       "--trigger-http" ],
