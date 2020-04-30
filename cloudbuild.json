@@ -20,10 +20,11 @@
       "GetGameDataByDay",
       "--memory",
       "128MB",
+      "--timeout",
+      "5s",
       "--allow-unauthenticated",
       "--trigger-http" ],
     "dir": "functions/autodeploy",
-    "timeout": "5s",
     "env": [
       "DATE_FMT=${_DATE_FMT}",
       "DB_COLLECTION=${_DB_COLLECTION}",
