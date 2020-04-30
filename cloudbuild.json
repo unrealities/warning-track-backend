@@ -15,7 +15,7 @@
       "--entry-point", "GetGameDataByDay",
       "--memory", "128MB",
       "--runtime", "go113",
-      "--set-en-vars", "DATE_FMT=${_DATE_FMT},DB_COLLECTION=${_DB_COLLECTION},FN_NAME=${_FUNCTION_NAME},PROJECT_ID=$PROJECT_ID,VERSION=$REVISION_ID",
+      "--set-env-vars", "DATE_FMT=${_DATE_FMT},DB_COLLECTION=${_DB_COLLECTION},FN_NAME=${_FUNCTION_NAME},PROJECT_ID=$PROJECT_ID,VERSION=$REVISION_ID",
       "--timeout", "5s",
       "--allow-unauthenticated",
       "--trigger-http" ],
