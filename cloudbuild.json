@@ -11,27 +11,15 @@
   {
     "name": "gcr.io/cloud-builders/gcloud",
     "args": [ 
-      "functions",
-      "deploy",
-      "GetGameDataByDay",
-      "--runtime", 
-      "go113",
-      "--entry-point",
-      "GetGameDataByDay",
-      "--memory",
-      "128MB",
-      "--timeout",
-      "5s",
+      "functions", "deploy", "GetGameDataByDay",
+      "--entry-point", "GetGameDataByDay",
+      "--memory", "128MB",
+      "--runtime", "go113",
+      "--set-en-vars", "DATE_FMT=${_DATE_FMT},DB_COLLECTION=${_DB_COLLECTION},FN_NAME=${_FUNCTION_NAME},PROJECT_ID=$PROJECT_ID,VERSION=$REVISION_ID"
+      "--timeout", "5s",
       "--allow-unauthenticated",
       "--trigger-http" ],
     "dir": "functions/autodeploy",
-    "env": [
-      "DATE_FMT=${_DATE_FMT}",
-      "DB_COLLECTION=${_DB_COLLECTION}",
-      "FN_NAME=${_FUNCTION_NAME}",
-      "PROJECT_ID=$PROJECT_ID",
-      "VERSION=$REVISION_ID"
-    ]
   }],
   "substitutions": {
     "_DATE_FMT": "01-02-2006",
