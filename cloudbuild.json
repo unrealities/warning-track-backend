@@ -16,6 +16,8 @@
       "${_FUNCTION_NAME}",
       "--runtime", 
       "go113",
+      "--entry-point",
+      "#{_FUNCTION_NAME}",
       "--allow-unauthenticated",
       "--trigger-http" ],
     "dir": "functions/autodeploy",
