@@ -93,7 +93,6 @@ func InitService(ctx context.Context) (Service, error) {
 	if err != nil {
 		return Service{}, fmt.Errorf("error setting up Error Reporting: %s", err)
 	}
-	defer errorClient.Close()
 	s.ErrorReporter = errorClient
 
 	// Cloud Logging
@@ -101,7 +100,7 @@ func InitService(ctx context.Context) (Service, error) {
 	if err != nil {
 		return Service{}, fmt.Errorf("error setting up Google Cloud logger: %s", err)
 	}
-	defer logClient.Close()
+
 	logClient.OnError = func(e error) {
 		fmt.Fprintf(os.Stderr, "logClient error: %v", e)
 	}
