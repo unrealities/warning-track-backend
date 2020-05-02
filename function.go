@@ -18,10 +18,8 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		s.HandleFatalError("error initializing service", err)
 	}
-	defer s.ErrorReporter.Close()
-	defer s.FirestoreClient.Close()
-	defer s.Logger.Close()
-	defer s.TraceSpan.End()
+	// Defers add ~3 seconds to the function runtime.
+	// defer s.ErrorReporter.Close(); defer s.FirestoreClient.Close(); defer s.Logger.Close(); defer s.TraceSpan.End()
 
 	date, err := parseDate(r.Body, s.DateFmt)
 	if err != nil {
