@@ -112,8 +112,7 @@ func InitService(ctx context.Context) (Service, error) {
 	s.Logger = logClient
 
 	// Firestore
-	conf := &firebase.Config{ProjectID: s.ProjectID}
-	app, err := firebase.NewApp(ctx, conf)
+	app, err := firebase.NewApp(ctx, &firebase.Config{ProjectID: s.ProjectID})
 	if err != nil {
 		return Service{}, fmt.Errorf("error setting up Firebase app: %s", err)
 	}
