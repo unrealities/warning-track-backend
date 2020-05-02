@@ -86,9 +86,6 @@ func InitService(ctx context.Context) (Service, error) {
 	errorClient, err := errorreporting.NewClient(ctx, s.ProjectID, errorreporting.Config{
 		ServiceName:    s.FunctionName,
 		ServiceVersion: s.Version,
-		OnError: func(e error) {
-			fmt.Fprintf(os.Stderr, "Could not log error: %v", e)
-		},
 	})
 	if err != nil {
 		return Service{}, fmt.Errorf("error setting up Error Reporting: %s", err)
