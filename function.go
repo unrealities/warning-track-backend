@@ -35,7 +35,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	}
 	s.DebugMsg("successfully fetched schedule")
 
-	_, err = s.FirestoreClient.Collection(s.DbCollection).Doc(date.Format(s.DateFmt)).Set(ctx, daySchedule)
+	_, err = s.FirestoreClient.Collection(s.DBCollection).Doc(date.Format(s.DateFmt)).Set(ctx, daySchedule)
 	if err != nil {
 		s.HandleFatalError("error persisting data to Firebase", err)
 	}

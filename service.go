@@ -19,7 +19,7 @@ import (
 type Service struct {
 	Date            time.Time
 	DateFmt         string
-	DbCollection    string
+	DBCollection    string
 	ErrorReporter   *errorreporting.Client
 	FirestoreClient *firestore.Client
 	FunctionName    string
@@ -31,9 +31,13 @@ type Service struct {
 
 // LogMessage is a simple struct to ensure JSON formatting in logs
 type LogMessage struct {
-	Err     string  `json:",omitempty"`
-	Msg     string  `json:"msg"`
-	Service Service `json:"service"`
+	Date         string `json:"date"`
+	DBCollection string `json:"dbCollection"`
+	Err          string `json:",omitempty"`
+	FunctionName string `json:"functionName"`
+	Msg          string `json:"msg"`
+	ProjectID    string `json:"projectID"`
+	Version      string `json:"version"`
 }
 
 // DebugMsg logs a simple debug message with function name and version
@@ -41,8 +45,12 @@ func (s Service) DebugMsg(msg string) {
 	s.Logger.Logger(s.FunctionName).Log(logging.Entry{
 		Severity: logging.Debug,
 		Payload: LogMessage{
-			Msg:     msg,
-			Service: s,
+			Date:         s.Date.Format(s.DateFmt),
+			DBCollection: s.DBCollection,
+			FunctionName: s.FunctionName,
+			Msg:          msg,
+			ProjectID:    s.ProjectID,
+			Version:      s.Version,
 		},
 	})
 }
@@ -53,9 +61,13 @@ func (s Service) HandleFatalError(msg string, err error) {
 	s.Logger.Logger(s.FunctionName).Log(logging.Entry{
 		Severity: logging.Error,
 		Payload: LogMessage{
-			Msg:     msg,
-			Err:     err.Error(),
-			Service: s,
+			Date:         s.Date.Format(s.DateFmt),
+			DBCollection: s.DBCollection,
+			Err:          err.Error(),
+			FunctionName: s.FunctionName,
+			Msg:          msg,
+			ProjectID:    s.ProjectID,
+			Version:      s.Version,
 		},
 		Trace:  fmt.Sprintf("projects/%s/trace/%s", s.ProjectID, s.TraceSpan.SpanContext().TraceID.String()),
 		SpanID: s.TraceSpan.SpanContext().SpanID.String(),
@@ -67,7 +79,7 @@ func (s Service) HandleFatalError(msg string, err error) {
 func InitService(ctx context.Context) (Service, error) {
 	s := Service{
 		DateFmt:      os.Getenv("DATE_FMT"),
-		DbCollection: os.Getenv("DB_COLLECTION"),
+		DBCollection: os.Getenv("DB_COLLECTION"),
 		ProjectID:    os.Getenv("PROJECT_ID"),
 		FunctionName: os.Getenv("FN_NAME"),
 		Version:      os.Getenv("VERSION"),
