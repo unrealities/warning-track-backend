@@ -97,10 +97,6 @@ func InitService(ctx context.Context) (Service, error) {
 	if err != nil {
 		return Service{}, fmt.Errorf("error setting up Google Cloud logger: %s", err)
 	}
-
-	logClient.OnError = func(e error) {
-		fmt.Fprintf(os.Stderr, "logClient error: %v", e)
-	}
 	s.Logger = logClient
 
 	// Firestore
