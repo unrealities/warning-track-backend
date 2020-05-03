@@ -2,9 +2,7 @@ package function
 
 import (
 	"encoding/json"
-	"io"
 	"net/http"
-	"time"
 
 	"github.com/unrealities/warning-track-backend/mlbStats"
 )
@@ -23,18 +21,23 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	defer s.Logger.Close()
 	defer s.TraceSpan.End()
 
-	date, err := parseDate(r.Body, s.DateFmt)
+	date, err := ParseDate(r.Body, s.DateFmt)
 	if err != nil {
 		s.HandleFatalError("error parsing date requested", err)
 	}
 	s.Date = date
 
+	// Extract
 	daySchedule, err := mlbStats.GetSchedule(s.Date) // Execution Time: ~1000ms
 	if err != nil {
 		s.HandleFatalError("error getting the daily StatsAPI schedule", err)
 	}
 	s.DebugMsg("successfully fetched schedule")
 
+	// Transform
+	
+
+	// Load
 	_, err = s.FirestoreClient.Collection(s.DBCollection).Doc(date.Format(s.DateFmt)).Set(ctx, daySchedule) // Execution Time: ~ 3500ms
 	if err != nil {
 		s.HandleFatalError("error persisting data to Firebase", err)
@@ -42,16 +45,4 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(daySchedule)
-}
-
-// parseDate parses the request body and returns a time.Time value of the requested date
-func parseDate(reqBody io.ReadCloser, dateFormat string) (time.Time, error) {
-	var d struct {
-		Date string `json:"date"`
-	}
-	if err := json.NewDecoder(reqBody).Decode(&d); err != nil {
-		return time.Time{}, err
-	}
-
-	return time.Parse(dateFormat, d.Date)
 }
