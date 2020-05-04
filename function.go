@@ -35,7 +35,6 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	s.DebugMsg("successfully fetched schedule")
 
 	// Transform
-	
 
 	// Load
 	_, err = s.FirestoreClient.Collection(s.DBCollection).Doc(date.Format(s.DateFmt)).Set(ctx, daySchedule) // Execution Time: ~ 3500ms
