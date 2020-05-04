@@ -114,25 +114,25 @@ type Game struct {
 		NoHitter            bool `json:"noHitter"`
 		PerfectGame         bool `json:"perfectGame"`
 	} `json:"flags"`
-	GameDate               string                      `json:"gameDate"`
-	GameNumber             int64                       `json:"gameNumber"`
-	GamePk                 int64                       `json:"gamePk"`
-	GameType               string                      `json:"gameType"`
-	GamedayType            string                      `json:"gamedayType"`
-	GamesInSeries          int64                       `json:"gamesInSeries"`
-	IfNecessary            string                      `json:"ifNecessary"`
-	IfNecessaryDescription string                      `json:"ifNecessaryDescription"`
-	InningBreakLength      int64                       `json:"inningBreakLength"`
-	Linescore              Linescore       `json:"linescore"`
-	Link                                                                string    `json:"link"`
-	PublicFacing                                                           bool      `json:"publicFacing"`
-	RecordSource                                                        string    `json:"recordSource"`
-	ScheduledInnings                                                       int64     `json:"scheduledInnings"`
-	Season                                                              string    `json:"season"`
-	SeasonDisplay                                                       string    `json:"seasonDisplay"`
-	SeriesDescription                                                   string    `json:"seriesDescription"`
-	SeriesGameNumber                                                       int64     `json:"seriesGameNumber"`
-	Status                                               struct {
+	GameDate               string    `json:"gameDate"`
+	GameNumber             int64     `json:"gameNumber"`
+	GamePk                 int64     `json:"gamePk"`
+	GameType               string    `json:"gameType"`
+	GamedayType            string    `json:"gamedayType"`
+	GamesInSeries          int64     `json:"gamesInSeries"`
+	IfNecessary            string    `json:"ifNecessary"`
+	IfNecessaryDescription string    `json:"ifNecessaryDescription"`
+	InningBreakLength      int64     `json:"inningBreakLength"`
+	Linescore              Linescore `json:"linescore"`
+	Link                   string    `json:"link"`
+	PublicFacing           bool      `json:"publicFacing"`
+	RecordSource           string    `json:"recordSource"`
+	ScheduledInnings       int64     `json:"scheduledInnings"`
+	Season                 string    `json:"season"`
+	SeasonDisplay          string    `json:"seasonDisplay"`
+	SeriesDescription      string    `json:"seriesDescription"`
+	SeriesGameNumber       int64     `json:"seriesGameNumber"`
+	Status                 struct {
 		AbstractGameCode  string `json:"abstractGameCode"`
 		AbstractGameState string `json:"abstractGameState"`
 		CodedGameState    string `json:"codedGameState"`
@@ -164,17 +164,17 @@ type Linescore struct {
 	InningHalf  string `json:"inningHalf"`
 	InningState string `json:"inningState"`
 	Innings     []struct {
-		Away TeamLinescore `json:"away"`
-		Home TeamLinescore `json:"home"`
-		Num        int64  `json:"num"`
-		OrdinalNum string `json:"ordinalNum"`
+		Away       TeamLinescore `json:"away"`
+		Home       TeamLinescore `json:"home"`
+		Num        int64         `json:"num"`
+		OrdinalNum string        `json:"ordinalNum"`
 	} `json:"innings"`
 	IsTopInning bool   `json:"isTopInning"`
 	Note        string `json:"note"`
 	Offense     struct {
-		First Player `json:"first"`
-		Second Player`json:"second"`
-		Third Player `json:"third"`
+		First  Player `json:"first"`
+		Second Player `json:"second"`
+		Third  Player `json:"third"`
 	} `json:"offense"`
 	Outs             int64 `json:"outs"`
 	ScheduledInnings int64 `json:"scheduledInnings"`
@@ -201,6 +201,8 @@ type Schedule struct {
 	TotalGamesInProgress int64      `json:"totalGamesInProgress"`
 	TotalItems           int64      `json:"totalItems"`
 }
+
+// SpringLeague is a team's spring league data
 
 // Team is data identifying a team of players
 type Team struct {
@@ -230,15 +232,10 @@ type Team struct {
 		Link string `json:"link"`
 		Name string `json:"name"`
 	} `json:"sport"`
-	SpringLeague struct {
-		Abbreviation string `json:"abbreviation"`
-		ID           int64  `json:"id"`
-		Link         string `json:"link"`
-		Name         string `json:"name"`
-	} `json:"springLeague"`
-	TeamCode string `json:"teamCode"`
-	TeamName string `json:"teamName"`
-	Venue    struct {
+	SpringLeague SpringLeague `json:"springLeague"`
+	TeamCode     string       `json:"teamCode"`
+	TeamName     string       `json:"teamName"`
+	Venue        struct {
 		ID   int64  `json:"id"`
 		Link string `json:"link"`
 		Name string `json:"name"`
