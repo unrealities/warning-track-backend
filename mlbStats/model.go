@@ -203,6 +203,12 @@ type Schedule struct {
 }
 
 // SpringLeague is a team's spring league data
+type SpringLeague struct {
+	Abbreviation string `json:"abbreviation"`
+	ID           int64  `json:"id"`
+	Link         string `json:"link"`
+	Name         string `json:"name"`
+}
 
 // Team is data identifying a team of players
 type Team struct {
@@ -257,14 +263,9 @@ type TeamWithRecord struct {
 		Pct    string `json:"pct"`
 		Wins   int64  `json:"wins"`
 	} `json:"leagueRecord"`
-	Score        int64 `json:"score"`
-	SeriesNumber int64 `json:"seriesNumber"`
-	SplitSquad   bool  `json:"splitSquad"`
-	SpringLeague struct {
-		Abbreviation string `json:"abbreviation"`
-		ID           int64  `json:"id"`
-		Link         string `json:"link"`
-		Name         string `json:"name"`
-	} `json:"springLeague"`
-	Team Team `json:"team"`
+	Score        int64        `json:"score"`
+	SeriesNumber int64        `json:"seriesNumber"`
+	SplitSquad   bool         `json:"splitSquad"`
+	SpringLeague SpringLeague `json:"springLeague"`
+	Team         Team         `json:"team"`
 }
