@@ -3,12 +3,35 @@ package transformers
 import (
 	"time"
 
-	"github.com/unrealities/warning-track-backend/mlbStats"
+	"github.com/unrealities/warning-track-backend/mlbstats"
 )
 
-// OptimusPrime takes a mlbStats.Schedule and produces an AllSpark
-func OptimusPrime(daySchedule mlbStats.Schedule) AllSpark {
-	return AllSpark{}
+// OptimusPrime takes a mlbstats.Schedule and produces an AllSpark with a day's game data
+func OptimusPrime(date time.Time, daySchedule mlbstats.Schedule) (AllSpark, error) {
+	var err Error
+	mlbstatsDateFmt := "2020-02-01"
+	mlbstatsGames := []mlbstats.Game{}
+
+	// ensure that we are looping through correct date
+	for _, d := range daySchedule.Dates {
+		mlbstatsDateString := d.Date
+		mlbstatsDate, err := time.Parse(mlbstatsDateFmt, mlbstatsDateString)
+		if err != nil {
+			break
+		}
+		if mlbstatsDate == date {
+			mlbstatsGames = d.Games
+			break
+		}
+	}
+	if err != nil {
+		return AllSpark{}, err
+	}
+	if len(mlbstatsGames) == 0 {
+		return AllSpark{}, fmt.Errorf("unable to find a matching date from mlbstats")
+	}
+
+	return AllSpark{}, nil
 }
 
 // AllSpark contains all the necessary MLB data for Warning-Track to function
