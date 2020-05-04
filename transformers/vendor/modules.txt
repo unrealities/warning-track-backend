@@ -1,2 +1,0 @@
-# github.com/unrealities/warning-track-backend/mlbStats v0.1.0
-github.com/unrealities/warning-track-backend/mlbStats

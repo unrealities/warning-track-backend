@@ -114,25 +114,25 @@ type Game struct {
 		NoHitter            bool `json:"noHitter"`
 		PerfectGame         bool `json:"perfectGame"`
 	} `json:"flags"`
-	GameDate               string       `json:"gameDate"`
-	GameNumber             int64        `json:"gameNumber"`
-	GamePk                 int64        `json:"gamePk"`
-	GameType               string       `json:"gameType"`
-	GamedayType            string       `json:"gamedayType"`
-	GamesInSeries          int64        `json:"gamesInSeries"`
-	IfNecessary            string       `json:"ifNecessary"`
-	IfNecessaryDescription string       `json:"ifNecessaryDescription"`
-	InningBreakLength      int64        `json:"inningBreakLength"`
-	Linescore              Linescore  `json:"linescore"`
-	Link                        s   tring    `json:"link"`
-	PublicFacing                   bool      `json:"publicFacing"`
-	RecordSource                st   ring    `json:"recordSource"`
-	ScheduledInnings               int64     `json:"scheduledInnings"`
-	Season                      s   tring    `json:"season"`
-	SeasonDisplay               st   ring    `json:"seasonDisplay"`
-	SeriesDescription           s   tring    `json:"seriesDescription"`
-	SeriesGameNumber               int64     `json:"seriesGameNumber"`
-	Status                      struct {
+	GameDate               string    `json:"gameDate"`
+	GameNumber             int64     `json:"gameNumber"`
+	GamePk                 int64     `json:"gamePk"`
+	GameType               string    `json:"gameType"`
+	GamedayType            string    `json:"gamedayType"`
+	GamesInSeries          int64     `json:"gamesInSeries"`
+	IfNecessary            string    `json:"ifNecessary"`
+	IfNecessaryDescription string    `json:"ifNecessaryDescription"`
+	InningBreakLength      int64     `json:"inningBreakLength"`
+	Linescore              Linescore `json:"linescore"`
+	Link                   string    `json:"link"`
+	PublicFacing           bool      `json:"publicFacing"`
+	RecordSource           string    `json:"recordSource"`
+	ScheduledInnings       int64     `json:"scheduledInnings"`
+	Season                 string    `json:"season"`
+	SeasonDisplay          string    `json:"seasonDisplay"`
+	SeriesDescription      string    `json:"seriesDescription"`
+	SeriesGameNumber       int64     `json:"seriesGameNumber"`
+	Status                 struct {
 		AbstractGameCode  string `json:"abstractGameCode"`
 		AbstractGameState string `json:"abstractGameState"`
 		CodedGameState    string `json:"codedGameState"`
