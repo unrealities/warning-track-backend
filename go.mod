@@ -8,6 +8,6 @@ require (
 	cloud.google.com/go/logging v1.0.0
 	contrib.go.opencensus.io/exporter/stackdriver v0.13.1
 	firebase.google.com/go v3.12.1+incompatible
-	github.com/unrealities/warning-track-backend/mlbstats v0.2.4
+	github.com/unrealities/warning-track-backend/mlbstats v0.2.5
 	go.opencensus.io v0.22.3
 )

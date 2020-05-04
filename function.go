@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/unrealities/warning-track-backend/mlbStats"
+	"github.com/unrealities/warning-track-backend/mlbstats"
 )
 
 // GetGameDataByDay returns useful (to Warning-Track) game information for given date
@@ -28,7 +28,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	s.Date = date
 
 	// Extract
-	daySchedule, err := mlbStats.GetSchedule(s.Date) // Execution Time: ~1000ms
+	daySchedule, err := mlbstats.GetSchedule(s.Date) // Execution Time: ~1000ms
 	if err != nil {
 		s.HandleFatalError("error getting the daily StatsAPI schedule", err)
 	}
