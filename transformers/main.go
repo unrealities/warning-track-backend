@@ -1,6 +1,7 @@
 package transformers
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/unrealities/warning-track-backend/mlbstats"
@@ -8,7 +9,7 @@ import (
 
 // OptimusPrime takes a mlbstats.Schedule and produces an AllSpark with a day's game data
 func OptimusPrime(date time.Time, daySchedule mlbstats.Schedule) (AllSpark, error) {
-	var err Error
+	var err error
 	mlbstatsDateFmt := "2020-02-01"
 	mlbstatsGames := []mlbstats.Game{}
 

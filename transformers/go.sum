@@ -1,3 +1,5 @@
 github.com/unrealities/warning-track-backend v0.0.0-20200502193619-d7dfde989b72 h1:Ip7cDM4W7K8nP3jzBNwYIY0YfzEWdAfWuTCRsG37/jE=
 github.com/unrealities/warning-track-backend/mlbStats v0.1.0 h1:QA3sratRvmRIaXVdN6mvgouGm+Z3x5d/gElsy9OlOvY=
 github.com/unrealities/warning-track-backend/mlbStats v0.1.0/go.mod h1:kQF/f1QVpbW4SzGhBWtt9JeATZBR6100YGvFCNx5bqE=
+github.com/unrealities/warning-track-backend/mlbstats v0.2.5 h1:Q26ParLHfZwSOnx+jIorhe7ypJVfSXFS7NdfR+VJwrY=
+github.com/unrealities/warning-track-backend/mlbstats v0.2.5/go.mod h1:S4BS5oyeuw6L57r5bqoywxedk3nFmUCEe5x7FnpC43s=
