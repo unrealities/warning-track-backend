@@ -117,11 +117,8 @@ github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFR
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.4.0 h1:2E4SXV/wtOkTonXsotYi4li6zVWxYlZuYNCXe9XRJyk=
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
-github.com/unrealities/warning-track-backend/mlbstats v0.2.5/go.mod h1:S4BS5oyeuw6L57r5bqoywxedk3nFmUCEe5x7FnpC43s=
-github.com/unrealities/warning-track-backend/mlbstats v0.2.6 h1:nblsnDyi1Czo7a4khxUR7et9ebNNrF9TnrvK255xvHs=
-github.com/unrealities/warning-track-backend/mlbstats v0.2.6/go.mod h1:S4BS5oyeuw6L57r5bqoywxedk3nFmUCEe5x7FnpC43s=
-github.com/unrealities/warning-track-backend/transformers v0.0.2 h1:PgbwagEy93IJVM++Bf5lZwzYp0Z32GaFH6T6tn+07nc=
-github.com/unrealities/warning-track-backend/transformers v0.0.2/go.mod h1:xSRXhMH8WhU+axxC3+BAoJqGqlVzxLgDm1OrKPq6hvE=
+github.com/unrealities/warning-track-backend/mlbstats v0.2.8 h1:pl8QGOEHdo+yspsKLjyMqRworS/y3QBcpTu9fVjvciU=
+github.com/unrealities/warning-track-backend/mlbstats v0.2.8/go.mod h1:S4BS5oyeuw6L57r5bqoywxedk3nFmUCEe5x7FnpC43s=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=
 go.opencensus.io v0.22.0/go.mod h1:+kGneAE2xo2IficOXnaByMWTGM9T73dGwxeWcUqIpI8=
