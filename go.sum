@@ -119,6 +119,8 @@ github.com/stretchr/testify v1.4.0 h1:2E4SXV/wtOkTonXsotYi4li6zVWxYlZuYNCXe9XRJy
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
 github.com/unrealities/warning-track-backend/mlbstats v0.2.8 h1:pl8QGOEHdo+yspsKLjyMqRworS/y3QBcpTu9fVjvciU=
 github.com/unrealities/warning-track-backend/mlbstats v0.2.8/go.mod h1:S4BS5oyeuw6L57r5bqoywxedk3nFmUCEe5x7FnpC43s=
+github.com/unrealities/warning-track-backend/mlbstats v0.2.9 h1:xfLe06KAUTB0GtN/R29hRJanI8nlPccO+dKyu4uUxdg=
+github.com/unrealities/warning-track-backend/mlbstats v0.2.9/go.mod h1:S4BS5oyeuw6L57r5bqoywxedk3nFmUCEe5x7FnpC43s=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=
 go.opencensus.io v0.22.0/go.mod h1:+kGneAE2xo2IficOXnaByMWTGM9T73dGwxeWcUqIpI8=
