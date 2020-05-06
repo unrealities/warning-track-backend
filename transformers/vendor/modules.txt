@@ -1,2 +1,2 @@
-# github.com/unrealities/warning-track-backend/mlbstats v0.2.8
+# github.com/unrealities/warning-track-backend/mlbstats v0.2.9
 github.com/unrealities/warning-track-backend/mlbstats
