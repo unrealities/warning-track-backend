@@ -14,7 +14,7 @@ func (s Schedule) Date(date time.Time, dateFmt string) (DateData, error) {
 			continue
 		}
 		if dateTime == date {
-			return dateTime, nil
+			return d, nil
 		}
 	}
 
