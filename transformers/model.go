@@ -17,7 +17,7 @@ type Count struct {
 // Game holds all the necessary fields of a given game
 type Game struct {
 	GameTime  time.Time `json:"gameTime"`
-	MLBId     int       `json:"mlbID"`
+	MLBId     int64     `json:"mlbID"`
 	MLBTVLink string    `json:"mlbTVLink"`
 	Status    Status    `json:"status"`
 	Teams     Teams     `json:"teams"`
