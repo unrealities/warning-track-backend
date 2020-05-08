@@ -1,6 +1,7 @@
 package transformers
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/unrealities/warning-track-backend/mlbstats"
@@ -17,6 +18,17 @@ func OptimusPrime(date time.Time, schedule mlbstats.Schedule) (AllSpark, error) 
 
 	for i, g := range d.Games {
 		Games[i].MLBId = g.GamePk
+		Games[i].MLBTVLink = fmt.Sprintf("https://www.mlb.com/tv/g%v", g.GamePk)
+
+		gameTime, err := time.Parse(g.GameDate, time.RFC3339)
+		if err != nil {
+			continue
+		}
+		Games[i].GameTime = gameTime
+
+		//TODO:
+		//Games[i].Status
+		//Games[i].Teams
 	}
 
 	return AllSpark{Games}, nil
