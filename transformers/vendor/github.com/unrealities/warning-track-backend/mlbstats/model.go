@@ -169,20 +169,23 @@ type Linescore struct {
 		Num        int64         `json:"num"`
 		OrdinalNum string        `json:"ordinalNum"`
 	} `json:"innings"`
-	IsTopInning bool   `json:"isTopInning"`
-	Note        string `json:"note"`
-	Offense     struct {
-		First  Player `json:"first"`
-		Second Player `json:"second"`
-		Third  Player `json:"third"`
-	} `json:"offense"`
-	Outs             int64 `json:"outs"`
-	ScheduledInnings int64 `json:"scheduledInnings"`
-	Strikes          int64 `json:"strikes"`
+	IsTopInning      bool    `json:"isTopInning"`
+	Note             string  `json:"note"`
+	Offense          Offense `json:"offense"`
+	Outs             int64   `json:"outs"`
+	ScheduledInnings int64   `json:"scheduledInnings"`
+	Strikes          int64   `json:"strikes"`
 	Teams            struct {
 		Away TeamLinescore `json:"away"`
 		Home TeamLinescore `json:"home"`
 	} `json:"teams"`
+}
+
+// Offense shows what players are on base
+type Offense struct {
+	First  Player `json:"first"`
+	Second Player `json:"second"`
+	Third  Player `json:"third"`
 }
 
 // Player is simple player data
