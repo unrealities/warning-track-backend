@@ -33,7 +33,7 @@ func OptimusPrime(date time.Time, schedule mlbstats.Schedule) (AllSpark, error) 
 
 		// TODO
 		Games[i].Status = Status{
-			BaseRunnerState: 0,
+			BaseRunnerState: g.Linescore.Offense.BaseRunnerState(),
 			Count: Count{
 				Balls:   int(g.Linescore.Balls),
 				Strikes: int(g.Linescore.Strikes),
