@@ -46,7 +46,7 @@ func OptimusPrime(date time.Time, schedule mlbstats.Schedule) (AllSpark, error) 
 				Home: int(g.Linescore.Teams.Home.Runs),
 			},
 			State:       0,
-			TopOfInning: true,
+			TopOfInning: g.Linescore.IsTopInning,
 		}
 	}
 
