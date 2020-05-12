@@ -35,10 +35,10 @@ type Status struct {
 	BaseRunnerState int     `json:"baseRunnerState"` // 0:none; 1:1b; 2:2b; 3:3b; 4:1b,2b; 5:1b,3b; 6:2b,3b; 7:1b,2b,3b
 	Count           Count   `json:"count"`
 	Inning          int     `json:"inning"`
+	InProgress      bool    `json:"inProgress"`
 	Li              float64 `json:"leverageIndex"`
 	Outs            int     `json:"outs"`
 	Score           Score   `json:"score"`
-	State           int     `json:"state"`
 	TopOfInning     bool    `json:"topOfInning"`
 }
 
