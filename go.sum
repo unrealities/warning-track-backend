@@ -123,6 +123,8 @@ github.com/unrealities/warning-track-backend/mlbstats v0.2.9 h1:xfLe06KAUTB0GtN/
 github.com/unrealities/warning-track-backend/mlbstats v0.2.9/go.mod h1:S4BS5oyeuw6L57r5bqoywxedk3nFmUCEe5x7FnpC43s=
 github.com/unrealities/warning-track-backend/mlbstats v0.2.10 h1:cAKy9EdPT7P/4jQbto7WvV548teCheuzTmj11m/8XwA=
 github.com/unrealities/warning-track-backend/mlbstats v0.2.10/go.mod h1:S4BS5oyeuw6L57r5bqoywxedk3nFmUCEe5x7FnpC43s=
+github.com/unrealities/warning-track-backend/mlbstats v0.2.11 h1:CWn2VWQJENd20y5WRpm+ZzhZpJrwNtrP2YtDa/aAczo=
+github.com/unrealities/warning-track-backend/mlbstats v0.2.11/go.mod h1:S4BS5oyeuw6L57r5bqoywxedk3nFmUCEe5x7FnpC43s=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=
 go.opencensus.io v0.22.0/go.mod h1:+kGneAE2xo2IficOXnaByMWTGM9T73dGwxeWcUqIpI8=

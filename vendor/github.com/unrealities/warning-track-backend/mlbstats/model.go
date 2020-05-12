@@ -132,14 +132,8 @@ type Game struct {
 	SeasonDisplay          string    `json:"seasonDisplay"`
 	SeriesDescription      string    `json:"seriesDescription"`
 	SeriesGameNumber       int64     `json:"seriesGameNumber"`
-	Status                 struct {
-		AbstractGameCode  string `json:"abstractGameCode"`
-		AbstractGameState string `json:"abstractGameState"`
-		CodedGameState    string `json:"codedGameState"`
-		DetailedState     string `json:"detailedState"`
-		StatusCode        string `json:"statusCode"`
-	} `json:"status"`
-	Teams struct {
+	Status                 Status    `json:"status"`
+	Teams                  struct {
 		Away TeamWithRecord `json:"away"`
 		Home TeamWithRecord `json:"home"`
 	} `json:"teams"`
@@ -169,20 +163,23 @@ type Linescore struct {
 		Num        int64         `json:"num"`
 		OrdinalNum string        `json:"ordinalNum"`
 	} `json:"innings"`
-	IsTopInning bool   `json:"isTopInning"`
-	Note        string `json:"note"`
-	Offense     struct {
-		First  Player `json:"first"`
-		Second Player `json:"second"`
-		Third  Player `json:"third"`
-	} `json:"offense"`
-	Outs             int64 `json:"outs"`
-	ScheduledInnings int64 `json:"scheduledInnings"`
-	Strikes          int64 `json:"strikes"`
+	IsTopInning      bool    `json:"isTopInning"`
+	Note             string  `json:"note"`
+	Offense          Offense `json:"offense"`
+	Outs             int64   `json:"outs"`
+	ScheduledInnings int64   `json:"scheduledInnings"`
+	Strikes          int64   `json:"strikes"`
 	Teams            struct {
 		Away TeamLinescore `json:"away"`
 		Home TeamLinescore `json:"home"`
 	} `json:"teams"`
+}
+
+// Offense shows what players are on base
+type Offense struct {
+	First  Player `json:"first"`
+	Second Player `json:"second"`
+	Third  Player `json:"third"`
 }
 
 // Player is simple player data
@@ -208,6 +205,15 @@ type SpringLeague struct {
 	ID           int64  `json:"id"`
 	Link         string `json:"link"`
 	Name         string `json:"name"`
+}
+
+// Status is a detailed representation of the game's status
+type Status struct {
+	AbstractGameCode  string `json:"abstractGameCode"`
+	AbstractGameState string `json:"abstractGameState"`
+	CodedGameState    string `json:"codedGameState"`
+	DetailedState     string `json:"detailedState"`
+	StatusCode        string `json:"statusCode"`
 }
 
 // Team is data identifying a team of players

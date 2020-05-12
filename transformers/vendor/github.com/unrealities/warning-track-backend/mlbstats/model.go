@@ -132,14 +132,8 @@ type Game struct {
 	SeasonDisplay          string    `json:"seasonDisplay"`
 	SeriesDescription      string    `json:"seriesDescription"`
 	SeriesGameNumber       int64     `json:"seriesGameNumber"`
-	Status                 struct {
-		AbstractGameCode  string `json:"abstractGameCode"`
-		AbstractGameState string `json:"abstractGameState"`
-		CodedGameState    string `json:"codedGameState"`
-		DetailedState     string `json:"detailedState"`
-		StatusCode        string `json:"statusCode"`
-	} `json:"status"`
-	Teams struct {
+	Status                 Status    `json:"status"`
+	Teams                  struct {
 		Away TeamWithRecord `json:"away"`
 		Home TeamWithRecord `json:"home"`
 	} `json:"teams"`
@@ -211,6 +205,15 @@ type SpringLeague struct {
 	ID           int64  `json:"id"`
 	Link         string `json:"link"`
 	Name         string `json:"name"`
+}
+
+// Status is a detailed representation of the game's status
+type Status struct {
+	AbstractGameCode  string `json:"abstractGameCode"`
+	AbstractGameState string `json:"abstractGameState"`
+	CodedGameState    string `json:"codedGameState"`
+	DetailedState     string `json:"detailedState"`
+	StatusCode        string `json:"statusCode"`
 }
 
 // Team is data identifying a team of players

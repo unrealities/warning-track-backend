@@ -44,3 +44,8 @@ func (o Offense) BaseRunnerState() int {
 	}
 	return 0
 }
+
+// InProgress returns a bool given a game's current state if the game is in progress or not
+func (s Status) InProgress() bool {
+	return s.DetailedState == "In Progress"
+}

@@ -39,7 +39,7 @@ func OptimusPrime(date time.Time, schedule mlbstats.Schedule) (AllSpark, error) 
 				Strikes: int(g.Linescore.Strikes),
 			},
 			Inning:     int(g.Linescore.CurrentInning),
-			InProgress: false,
+			InProgress: g.Status.InProgress(),
 			Li:         0.0,
 			Outs:       int(g.Linescore.Outs),
 			Score: Score{
