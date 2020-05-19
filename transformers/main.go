@@ -31,16 +31,18 @@ func OptimusPrime(date time.Time, schedule mlbstats.Schedule) (AllSpark, error) 
 			HomeID: int(g.Teams.Home.Team.ID),
 		}
 
-		// TODO
 		Games[i].Status = Status{
-			BaseRunnerState: g.Linescore.Offense.BaseRunnerState(),
+			BaseState: BaseState{
+				First:  g.Linescore.Offense.First.ID == 0,
+				Second: g.Linescore.Offense.Second.ID == 0,
+				Third:  g.Linescore.Offense.Third.ID == 0,
+			},
 			Count: Count{
 				Balls:   int(g.Linescore.Balls),
 				Strikes: int(g.Linescore.Strikes),
 			},
 			Inning:     int(g.Linescore.CurrentInning),
 			InProgress: g.Status.InProgress(),
-			Li:         0.0,
 			Outs:       int(g.Linescore.Outs),
 			Score: Score{
 				Away: int(g.Linescore.Teams.Away.Runs),
@@ -48,6 +50,8 @@ func OptimusPrime(date time.Time, schedule mlbstats.Schedule) (AllSpark, error) 
 			},
 			TopOfInning: g.Linescore.IsTopInning,
 		}
+
+		Games[i].LeverageIndex = Games[i].Status.LeverageIndex()
 	}
 
 	return AllSpark{Games}, nil

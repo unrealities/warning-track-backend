@@ -8,6 +8,13 @@ type AllSpark struct {
 	Games []Game `json:"games"`
 }
 
+// BaseState is a simple vision of the base runner status
+type BaseState struct {
+	First  bool
+	Second bool
+	Third  bool
+}
+
 // Count holds the game's current at-bat
 type Count struct {
 	Balls   int `json:"balls"`
@@ -16,11 +23,12 @@ type Count struct {
 
 // Game holds all the necessary fields of a given game
 type Game struct {
-	GameTime  time.Time `json:"gameTime"`
-	MLBId     int64     `json:"mlbID"`
-	MLBTVLink string    `json:"mlbTVLink"`
-	Status    Status    `json:"status"`
-	Teams     Teams     `json:"teams"`
+	GameTime      time.Time `json:"gameTime"`
+	LeverageIndex float32   `json:"leverageIndex"`
+	MLBId         int64     `json:"mlbID"`
+	MLBTVLink     string    `json:"mlbTVLink"`
+	Status        Status    `json:"status"`
+	Teams         Teams     `json:"teams"`
 }
 
 // Score holds the game's current score
@@ -32,14 +40,13 @@ type Score struct {
 // Status hold's all the game's current fields. These fields all will change
 // during the course of a game
 type Status struct {
-	BaseRunnerState int     `json:"baseRunnerState"` // 0:none; 1:1b; 2:2b; 3:3b; 4:1b,2b; 5:1b,3b; 6:2b,3b; 7:1b,2b,3b
-	Count           Count   `json:"count"`
-	Inning          int     `json:"inning"`
-	InProgress      bool    `json:"inProgress"`
-	Li              float64 `json:"leverageIndex"`
-	Outs            int     `json:"outs"`
-	Score           Score   `json:"score"`
-	TopOfInning     bool    `json:"topOfInning"`
+	BaseState   BaseState `json:"baseState"`
+	Count       Count     `json:"count"`
+	Inning      int       `json:"inning"`
+	InProgress  bool      `json:"inProgress"`
+	Outs        int       `json:"outs"`
+	Score       Score     `json:"score"`
+	TopOfInning bool      `json:"topOfInning"`
 }
 
 // Teams holds the teams playing in a given game
