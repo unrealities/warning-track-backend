@@ -6,10 +6,10 @@ import (
 )
 
 // Date validates if a Schedule has a given date and returns a DateData object if it exists
-func (s Schedule) Date(date time.Time, dateFmt string) (DateData, error) {
+func (s Schedule) Date(date time.Time) (DateData, error) {
 	for _, d := range s.Dates {
 		dateString := d.Date
-		dateTime, err := time.Parse(dateFmt, dateString)
+		dateTime, err := time.Parse(dateString, time.RFC3339)
 		if err != nil {
 			continue
 		}
