@@ -4,13 +4,17 @@ import (
 	"errors"
 )
 
+// ErrGameOver is returned if it has been determined the game is over
+//   If a game is over, then there is no leverage index
+var ErrGameOver = errors.New("leverage index is only for in progress games")
+
 // ErrInvalidInning is returned if a non-positive HalfInning.Inning is received
 var ErrInvalidInning = errors.New("inning should be a positive integer")
 
 // ErrInvalidOuts is returned if outs is invalid
 var ErrInvalidOuts = errors.New("outs should be a value of 0, 1, 2 or 3")
 
-// leverageIndices is pulled from `The Book`: http://www.insidethebook.com/li.shtml
+// LeverageIndices is pulled from `The Book`: http://www.insidethebook.com/li.shtml
 // These values are most likely older than 2008 and could use updating
 //
 // This a 24 x 154 matrix
@@ -102,6 +106,9 @@ func LeverageIndex(baseState BaseState, score Score, halfInning HalfInning, outs
 	}
 	if (outs < 0) || (outs > 3) {
 		return 0.0, ErrInvalidOuts
+	}
+	if halfInning.Inning >= 9 && !halfInning.TopOfInning && score.Home > score.Away {
+		return 0.0, ErrGameOver
 	}
 
 	// clean

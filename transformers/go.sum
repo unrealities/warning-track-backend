@@ -1,5 +1,7 @@
 github.com/unrealities/sabermetrics v0.1.0 h1:lGu7XhyvtqaAlTdlUCjICRCi/fo+nQdfis2R9nphj2o=
 github.com/unrealities/sabermetrics v0.1.0/go.mod h1:EFacWASnJOhJMDAoDWznDrTh9RhCjKXBhjT+ZAc7Tyw=
+github.com/unrealities/sabermetrics v0.1.1 h1:DOkNb4wJR4hPp0BNAbvVYeItFDpWejy3aslxOvmzfZY=
+github.com/unrealities/sabermetrics v0.1.1/go.mod h1:EFacWASnJOhJMDAoDWznDrTh9RhCjKXBhjT+ZAc7Tyw=
 github.com/unrealities/warning-track-backend/mlbstats v0.2.8 h1:pl8QGOEHdo+yspsKLjyMqRworS/y3QBcpTu9fVjvciU=
 github.com/unrealities/warning-track-backend/mlbstats v0.2.8/go.mod h1:S4BS5oyeuw6L57r5bqoywxedk3nFmUCEe5x7FnpC43s=
 github.com/unrealities/warning-track-backend/mlbstats v0.2.9 h1:xfLe06KAUTB0GtN/R29hRJanI8nlPccO+dKyu4uUxdg=
