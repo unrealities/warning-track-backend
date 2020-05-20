@@ -124,12 +124,12 @@ github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFR
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.4.0 h1:2E4SXV/wtOkTonXsotYi4li6zVWxYlZuYNCXe9XRJyk=
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
-github.com/unrealities/sabermetrics v0.1.0 h1:lGu7XhyvtqaAlTdlUCjICRCi/fo+nQdfis2R9nphj2o=
-github.com/unrealities/sabermetrics v0.1.0/go.mod h1:EFacWASnJOhJMDAoDWznDrTh9RhCjKXBhjT+ZAc7Tyw=
+github.com/unrealities/sabermetrics v0.1.1 h1:DOkNb4wJR4hPp0BNAbvVYeItFDpWejy3aslxOvmzfZY=
+github.com/unrealities/sabermetrics v0.1.1/go.mod h1:EFacWASnJOhJMDAoDWznDrTh9RhCjKXBhjT+ZAc7Tyw=
 github.com/unrealities/warning-track-backend/mlbstats v0.2.14 h1:BgMcBfy8PZuslZwvkNG+KSN9qmvvlbL/SrSxK19KyLw=
 github.com/unrealities/warning-track-backend/mlbstats v0.2.14/go.mod h1:S4BS5oyeuw6L57r5bqoywxedk3nFmUCEe5x7FnpC43s=
-github.com/unrealities/warning-track-backend/transformers v0.1.9 h1:LHzubMXvDQAdCQhaiLJ8hloI5ZYLIf4uDdfXteid4xY=
-github.com/unrealities/warning-track-backend/transformers v0.1.9/go.mod h1:bTctoc4kql/6JUKDm+x1PplkD1v580ZFCuSh1dHl218=
+github.com/unrealities/warning-track-backend/transformers v0.1.10 h1:q32sWnsMJkmaR3n0ZVqQPjgU7qlN9lb/cUjUbE/M0QQ=
+github.com/unrealities/warning-track-backend/transformers v0.1.10/go.mod h1:b+Kel7uGwMCvs/G9QGSBhPCRuBMWNXMQZdktLA7VD8Y=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=
