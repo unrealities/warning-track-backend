@@ -106,7 +106,7 @@ github.com/jstemmer/go-junit-report/parser
 github.com/unrealities/sabermetrics
 # github.com/unrealities/warning-track-backend/mlbstats v0.2.14
 github.com/unrealities/warning-track-backend/mlbstats
-# github.com/unrealities/warning-track-backend/transformers v0.1.7
+# github.com/unrealities/warning-track-backend/transformers v0.1.8
 github.com/unrealities/warning-track-backend/transformers
 # go.opencensus.io v0.22.3
 go.opencensus.io

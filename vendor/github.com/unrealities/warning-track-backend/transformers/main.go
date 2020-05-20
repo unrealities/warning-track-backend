@@ -20,7 +20,7 @@ func OptimusPrime(date time.Time, schedule mlbstats.Schedule) (AllSpark, error) 
 		Games[i].MLBId = g.GamePk
 		Games[i].MLBTVLink = fmt.Sprintf("https://www.mlb.com/tv/g%v", g.GamePk)
 
-		gameTime, err := time.Parse(g.GameDate, time.RFC3339)
+		gameTime, err := time.Parse(time.RFC3339, g.GameDate)
 		if err != nil {
 			continue
 		}
