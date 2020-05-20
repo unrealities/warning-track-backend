@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/unrealities/warning-track-backend/mlbstats"
+	"github.com/unrealities/warning-track-backend/transformers"
 )
 
 // GetGameDataByDay returns useful (to Warning-Track) game information for given date
@@ -35,9 +36,14 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	s.DebugMsg("successfully fetched schedule")
 
 	// Transform
+	games, err := transformers.OptimusPrime(s.Date, daySchedule)
+	if err != nil {
+		s.HandleFatalError("error transforming StatsAPI schedule to simpler games struct", err)
+	}
+	s.DebugMsg("successfully transformed data")
 
 	// Load
-	_, err = s.FirestoreClient.Collection(s.DBCollection).Doc(date.Format(s.DateFmt)).Set(ctx, daySchedule) // Execution Time: ~ 3500ms
+	_, err = s.FirestoreClient.Collection(s.DBCollection).Doc(date.Format(s.DateFmt)).Set(ctx, games) // Execution Time: ~ 3500ms
 	if err != nil {
 		s.HandleFatalError("error persisting data to Firebase", err)
 	}

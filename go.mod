@@ -9,6 +9,6 @@ require (
 	contrib.go.opencensus.io/exporter/stackdriver v0.13.1
 	firebase.google.com/go v3.12.1+incompatible
 	github.com/unrealities/warning-track-backend/mlbstats v0.2.11
-	github.com/unrealities/warning-track-backend/transformers v0.1.2 // indirect
+	github.com/unrealities/warning-track-backend/transformers v0.1.2
 	go.opencensus.io v0.22.3
 )
