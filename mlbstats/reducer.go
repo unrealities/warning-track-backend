@@ -9,7 +9,7 @@ import (
 func (s Schedule) Date(date time.Time) (DateData, error) {
 	for _, d := range s.Dates {
 		dateString := d.Date
-		dateTime, err := time.Parse(dateString, time.RFC3339)
+		dateTime, err := time.Parse(dateString, "2006-01-02")
 		if err != nil {
 			continue
 		}
