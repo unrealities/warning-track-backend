@@ -144,6 +144,8 @@ github.com/unrealities/warning-track-backend/transformers v0.1.4 h1:WJ4bcMZBsneu
 github.com/unrealities/warning-track-backend/transformers v0.1.4/go.mod h1:x+zjSSamLZ6q/aP3na2Gg36guKyAIhRel38C9+XeqpE=
 github.com/unrealities/warning-track-backend/transformers v0.1.6 h1:A3Cv8ergcJJapZ3AHC0lhkvqJoZnzNSGjCRg24twKts=
 github.com/unrealities/warning-track-backend/transformers v0.1.6/go.mod h1:bTctoc4kql/6JUKDm+x1PplkD1v580ZFCuSh1dHl218=
+github.com/unrealities/warning-track-backend/transformers v0.1.7 h1:9VZwEnDJuLgGQ2knpnKqoRzntAAsXES4dZz1/dSL38c=
+github.com/unrealities/warning-track-backend/transformers v0.1.7/go.mod h1:bTctoc4kql/6JUKDm+x1PplkD1v580ZFCuSh1dHl218=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=

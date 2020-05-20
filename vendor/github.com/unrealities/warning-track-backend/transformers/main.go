@@ -14,7 +14,7 @@ func OptimusPrime(date time.Time, schedule mlbstats.Schedule) (AllSpark, error) 
 		return AllSpark{}, err
 	}
 
-	Games := []Game{}
+	Games := make([]Game, len(d.Games))
 
 	for i, g := range d.Games {
 		Games[i].MLBId = g.GamePk
