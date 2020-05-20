@@ -102,11 +102,11 @@ github.com/jmespath/go-jmespath
 github.com/jstemmer/go-junit-report
 github.com/jstemmer/go-junit-report/formatter
 github.com/jstemmer/go-junit-report/parser
-# github.com/unrealities/sabermetrics v0.1.1
+# github.com/unrealities/sabermetrics v0.1.2
 github.com/unrealities/sabermetrics
 # github.com/unrealities/warning-track-backend/mlbstats v0.2.14
 github.com/unrealities/warning-track-backend/mlbstats
-# github.com/unrealities/warning-track-backend/transformers v0.1.10
+# github.com/unrealities/warning-track-backend/transformers v0.1.11
 github.com/unrealities/warning-track-backend/transformers
 # go.opencensus.io v0.22.3
 go.opencensus.io

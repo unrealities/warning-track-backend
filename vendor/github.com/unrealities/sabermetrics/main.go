@@ -14,6 +14,9 @@ var ErrInvalidInning = errors.New("inning should be a positive integer")
 // ErrInvalidOuts is returned if outs is invalid
 var ErrInvalidOuts = errors.New("outs should be a value of 0, 1, 2 or 3")
 
+// ErrUnexpectedIndex is returned if you managed to slip one past my validations
+var ErrUnexpectedIndex = errors.New("calculated an unexpected index that will not yield a valid leverage index")
+
 // LeverageIndices is pulled from `The Book`: http://www.insidethebook.com/li.shtml
 // These values are most likely older than 2008 and could use updating
 //
@@ -144,6 +147,11 @@ func LeverageIndex(baseState BaseState, score Score, halfInning HalfInning, outs
 	}
 	if halfInning.Int() == 17 { // Bottom of the ninth the home team can only be losing or tied
 		gameStateIndex = runDiff + 153
+	}
+
+	// prevent panic
+	if baseStateIndex > 24 || baseStateIndex < 0 || gameStateIndex > 153 || gameStateIndex < 0 {
+		return 0.0, ErrUnexpectedIndex
 	}
 
 	return LeverageIndices[baseStateIndex][gameStateIndex], nil
