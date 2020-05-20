@@ -30,6 +30,8 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+var newReportErrorsClientHook clientHook
+
 // ReportErrorsCallOptions contains the retry settings for each method of ReportErrorsClient.
 type ReportErrorsCallOptions struct {
 	ReportErrorEvent []gax.CallOption
@@ -72,7 +74,17 @@ type ReportErrorsClient struct {
 //
 // An API for reporting error events.
 func NewReportErrorsClient(ctx context.Context, opts ...option.ClientOption) (*ReportErrorsClient, error) {
-	connPool, err := gtransport.DialPool(ctx, append(defaultReportErrorsClientOptions(), opts...)...)
+	clientOpts := defaultReportErrorsClientOptions()
+
+	if newReportErrorsClientHook != nil {
+		hookOpts, err := newReportErrorsClientHook(ctx, clientHookParams{})
+		if err != nil {
+			return nil, err
+		}
+		clientOpts = append(clientOpts, hookOpts...)
+	}
+
+	connPool, err := gtransport.DialPool(ctx, append(clientOpts, opts...)...)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +94,7 @@ func NewReportErrorsClient(ctx context.Context, opts ...option.ClientOption) (*R
 
 		reportErrorsClient: clouderrorreportingpb.NewReportErrorsServiceClient(connPool),
 	}
-	c.SetGoogleClientInfo()
+	c.setGoogleClientInfo()
 
 	return c, nil
 }
@@ -100,10 +112,10 @@ func (c *ReportErrorsClient) Close() error {
 	return c.connPool.Close()
 }
 
-// SetGoogleClientInfo sets the name and version of the application in
+// setGoogleClientInfo sets the name and version of the application in
 // the `x-goog-api-client` header passed on each request. Intended for
 // use by Google-written clients.
-func (c *ReportErrorsClient) SetGoogleClientInfo(keyval ...string) {
+func (c *ReportErrorsClient) setGoogleClientInfo(keyval ...string) {
 	kv := append([]string{"gl-go", versionGo()}, keyval...)
 	kv = append(kv, "gapic", versionClient, "gax", gax.Version, "grpc", grpc.Version)
 	c.xGoogMetadata = metadata.Pairs("x-goog-api-client", gax.XGoogHeader(kv...))
