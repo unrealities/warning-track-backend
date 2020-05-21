@@ -2,6 +2,7 @@ package sabermetrics
 
 import (
 	"errors"
+	"log"
 )
 
 // ErrGameOver is returned if it has been determined the game is over
@@ -110,7 +111,7 @@ func LeverageIndex(baseState BaseState, score Score, halfInning HalfInning, outs
 	if (outs < 0) || (outs > 3) {
 		return 0.0, ErrInvalidOuts
 	}
-	if halfInning.Inning >= 9 && !halfInning.TopOfInning && score.Home > score.Away {
+	if halfInning.Inning >= 9 && score.Home > score.Away && (!halfInning.TopOfInning || outs == 3) {
 		return 0.0, ErrGameOver
 	}
 
@@ -151,6 +152,7 @@ func LeverageIndex(baseState BaseState, score Score, halfInning HalfInning, outs
 
 	// prevent panic
 	if baseStateIndex > 24 || baseStateIndex < 0 || gameStateIndex > 153 || gameStateIndex < 0 {
+		log.Printf("bs: %d, gs: %d", baseStateIndex, gameStateIndex)
 		return 0.0, ErrUnexpectedIndex
 	}
 
