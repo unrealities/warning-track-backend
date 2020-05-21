@@ -13,3 +13,7 @@ Leverage Index checks for possible end of game
 ## v0.1.2
 
 Prevent Leverage Index from panicking
+
+## v0.1.3
+
+Handle 3 outs and top of inning end of games for Leverage Index
