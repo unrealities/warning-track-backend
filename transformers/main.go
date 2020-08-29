@@ -33,9 +33,9 @@ func OptimusPrime(date time.Time, schedule mlbstats.Schedule) (AllSpark, error) 
 
 		Games[i].Status = Status{
 			BaseState: BaseState{
-				First:  g.Linescore.Offense.First.ID == 0,
-				Second: g.Linescore.Offense.Second.ID == 0,
-				Third:  g.Linescore.Offense.Third.ID == 0,
+				First:  g.Linescore.Offense.First.ID > 0,
+				Second: g.Linescore.Offense.Second.ID > 0,
+				Third:  g.Linescore.Offense.Third.ID > 0,
 			},
 			Count: Count{
 				Balls:   int(g.Linescore.Balls),
