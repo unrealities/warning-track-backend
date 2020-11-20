@@ -10,7 +10,7 @@ import (
 
 // GetGameDataByDay returns useful (to Warning-Track) game information for given date
 // ex. POST request:
-// https://us-central1-warning-track-backend.cloudfunctions.net/GetGameDataByDay -d {"date":"03-01-2020"}
+// https://us-central1-warning-track-backend.cloudfunctions.net/GetGameDataByDay -d {"data": {"date":"03-01-2020"}}
 func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	s, err := InitService(ctx) // Execution Time: ~300ms
