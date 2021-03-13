@@ -13,7 +13,7 @@
         "--memory",
         "128MB",
         "--runtime",
-        "go115",
+        "go113",
         "--service-account",
         "firebase-adminsdk-t8pqz@$PROJECT_ID.iam.gserviceaccount.com",
         "--set-env-vars",
