@@ -60,7 +60,7 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	// Set CORS headers for the main request.
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	// Response
+	// Send Response
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(games)
 }
