@@ -12,6 +12,16 @@ import (
 // ex. POST request:
 // https://us-central1-warning-track-backend.cloudfunctions.net/GetGameDataByDay -d {"data": {"date":"03-01-2020"}}
 func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
+	// Set CORS headers for the preflight request
+	if r.Method == http.MethodOptions {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+		w.Header().Set("Access-Control-Max-Age", "3600")
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
 	ctx := r.Context()
 	s, err := InitService(ctx) // Execution Time: ~300ms
 	if err != nil {
@@ -48,20 +58,8 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 		s.HandleFatalError("error persisting data to Firebase", err)
 	}
 
-	// CORS
-	// Set CORS headers for the preflight request
-	if r.Method == http.MethodOptions {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-		w.Header().Set("Access-Control-Max-Age", "3600")
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-	// Set CORS headers for the main request.
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-
 	// Send Response
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(games)
 }
