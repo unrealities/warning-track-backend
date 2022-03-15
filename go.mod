@@ -15,10 +15,7 @@ require (
 	github.com/unrealities/warning-track-backend/transformers v0.1.13
 	go.opencensus.io v0.23.0
 	golang.org/x/mod v0.4.2 // indirect
-	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110 // indirect
 	golang.org/x/oauth2 v0.0.0-20210313182246-cd4f82c27b84 // indirect
 	golang.org/x/sys v0.0.0-20210314195730-07df6a141424 // indirect
-	google.golang.org/api v0.41.0 // indirect
-	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20210315142602-88120395e650 // indirect
 )
