@@ -16,7 +16,12 @@ func ParseDate(reqBody io.ReadCloser, dateFormat string) (time.Time, error) {
 	}
 	var cont data
 
-	if err := json.NewDecoder(reqBody).Decode(&cont); err != nil {
+	err := json.NewDecoder(reqBody).Decode(&cont)
+	// If no date is passed. Return current date in UTC
+	switch {
+	case err == io.EOF:
+		return time.Now().UTC(), nil
+	case err != nil:
 		return time.Time{}, err
 	}
 

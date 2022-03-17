@@ -33,7 +33,6 @@ func GetGameDataByDay(w http.ResponseWriter, r *http.Request) {
 	defer s.Logger.Close()
 	defer s.TraceSpan.End()
 
-	// TODO: If there is no date passed use today's date
 	date, err := ParseDate(r.Body, s.DateFmt)
 	if err != nil {
 		s.HandleFatalError("error parsing date requested", err)
