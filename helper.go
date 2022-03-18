@@ -20,7 +20,11 @@ func ParseDate(reqBody io.ReadCloser, dateFormat string) (time.Time, error) {
 	// If no date is passed. Return current date in UTC
 	switch {
 	case err == io.EOF:
-		return time.Now().UTC(), nil
+		tz, err := time.LoadLocation("PST")
+		if err != nil {
+			return time.Time{}, err
+		}
+		return time.Now().In(tz), nil
 	case err != nil:
 		return time.Time{}, err
 	}
