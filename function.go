@@ -7,8 +7,12 @@ import (
 	"github.com/unrealities/warning-track-backend/mlbstats"
 	"github.com/unrealities/warning-track-backend/transformers"
 
-	_ "github.com/GoogleCloudPlatform/functions-framework-go/funcframework"
+	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 )
+
+func init() {
+	functions.HTTP("GetGameDataByDay", GetGameDataByDay)
+}
 
 // GetGameDataByDay returns useful (to Warning-Track) game information for given date
 // Runs on Google Cloud Scheduler daily

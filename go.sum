@@ -46,7 +46,6 @@ cloud.google.com/go/errorreporting v0.2.0 h1:b2QhVcl+43FS3qAYuoafNVvqYIc8uDUFeEB
 cloud.google.com/go/errorreporting v0.2.0/go.mod h1:QkYzg92wgpJ0ChLdcO5LhtCEyYwq0tIa+jLrj6Nh5ME=
 cloud.google.com/go/firestore v1.5.0 h1:4qNItsmc4GP6UOZPGemmHY4ZfPofVhcaKXsYw9wm9oA=
 cloud.google.com/go/firestore v1.5.0/go.mod h1:c4nNYR1qdq7eaZ+jSc5fonrQN2k3M7sWATcYTiakjEo=
-cloud.google.com/go/functions v1.0.0 h1:cOFEDJ3sgAFRjRULSUJ0Q8cw9qFa5JdpXIBWoNX5uDw=
 cloud.google.com/go/functions v1.0.0/go.mod h1:O9KS8UweFVo6GbbbCBKh5yEzbW08PVkg2spe3RfPMd4=
 cloud.google.com/go/iam v0.3.0 h1:exkAomrVUuzx9kWFI1wm3KI0uoDeUFPB4kKGzx6x+Gc=
 cloud.google.com/go/iam v0.3.0/go.mod h1:XzJPvDayI+9zsASAFO68Hk07u3z+f+JrT2xXNdp4bnY=
