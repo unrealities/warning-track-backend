@@ -6,6 +6,8 @@ import (
 
 	"github.com/unrealities/warning-track-backend/mlbstats"
 	"github.com/unrealities/warning-track-backend/transformers"
+
+	_ "github.com/GoogleCloudPlatform/functions-framework-go/funcframework"
 )
 
 // GetGameDataByDay returns useful (to Warning-Track) game information for given date
