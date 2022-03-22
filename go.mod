@@ -13,7 +13,6 @@ require (
 	cloud.google.com/go/trace v1.2.0 // indirect
 	contrib.go.opencensus.io/exporter/stackdriver v0.13.5
 	firebase.google.com/go v3.13.0+incompatible
-	github.com/GoogleCloudPlatform/functions-framework-go v1.5.3
 	github.com/aws/aws-sdk-go v1.37.30 // indirect
 	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
 	github.com/unrealities/warning-track-backend/mlbstats v0.2.14
