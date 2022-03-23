@@ -1,6 +1,6 @@
 module github.com/unrealities/warning-track-backend/transformers
 
-go 1.13
+go 1.17
 
 require (
 	github.com/unrealities/sabermetrics v0.1.3
