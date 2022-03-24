@@ -1,7 +1,3 @@
-mlbstats/go.mod
-mlbstats/go.sum
-transformers/go.mod
-transformers/go.sum
 go.mod
 go.sum
 

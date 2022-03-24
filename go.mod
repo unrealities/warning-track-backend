@@ -9,8 +9,7 @@ require (
 	contrib.go.opencensus.io/exporter/stackdriver v0.13.10
 	firebase.google.com/go v3.13.0+incompatible
 	github.com/GoogleCloudPlatform/functions-framework-go v1.5.3
-	github.com/unrealities/warning-track-backend/mlbstats v0.2.14
-	github.com/unrealities/warning-track-backend/transformers v0.1.13
+	github.com/unrealities/sabermetrics v0.1.3
 	go.opencensus.io v0.23.0
 )
 
@@ -34,7 +33,6 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
-	github.com/unrealities/sabermetrics v0.1.3 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	go.uber.org/zap v1.21.0 // indirect
