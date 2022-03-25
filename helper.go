@@ -15,18 +15,23 @@ func ParseDate(reqBody io.ReadCloser, dateFormat string) (time.Time, error) {
 		Data d `json:"data"`
 	}
 	var cont data
+	tz, err := time.LoadLocation("PDT")
+	if err != nil {
+		return time.Time{}, err
+	}
 
-	err := json.NewDecoder(reqBody).Decode(&cont)
-	// If no date is passed. Return current date in UTC
+	err = json.NewDecoder(reqBody).Decode(&cont)
+	// If no body is passed. Return current date in UTC
 	switch {
 	case err == io.EOF:
-		tz, err := time.LoadLocation("PDT")
-		if err != nil {
-			return time.Time{}, err
-		}
 		return time.Now().In(tz), nil
 	case err != nil:
 		return time.Time{}, err
+	}
+
+	// If no date key is passed. Return current date in UTC
+	if cont.Data.Date == "" {
+		return time.Now().In(tz), nil
 	}
 
 	return time.Parse(dateFormat, cont.Data.Date)
