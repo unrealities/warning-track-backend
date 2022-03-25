@@ -15,7 +15,7 @@ func ParseDate(reqBody io.ReadCloser, dateFormat string) (time.Time, error) {
 		Data d `json:"data"`
 	}
 	var cont data
-	tz, err := time.LoadLocation("PDT")
+	tz, err := time.LoadLocation("PST")
 	if err != nil {
 		return time.Time{}, err
 	}
