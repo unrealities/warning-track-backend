@@ -13,7 +13,8 @@ func (s Schedule) Date(date time.Time) (DateData, error) {
 		if err != nil {
 			continue
 		}
-		if dateTime == date {
+		// Check the days are equal
+		if dateTime.Truncate(24 * time.Hour).Equal(date.Truncate(24 * time.Hour)) {
 			return d, nil
 		}
 	}
