@@ -1,6 +1,6 @@
 # github.com/unrealities/sabermetrics v0.1.3
-## explicit; go 1.13
+## explicit; go 1.16
 github.com/unrealities/sabermetrics
 # github.com/unrealities/warning-track-backend/mlbstats v0.2.14
-## explicit; go 1.13
+## explicit; go 1.16
 github.com/unrealities/warning-track-backend/mlbstats
