@@ -21,7 +21,7 @@ func (s Schedule) Date(date time.Time) (DateData, error) {
 		}
 	}
 
-	return DateData{}, fmt.Errorf("unable to find a matching date from mlbstats: Looking for %v. Received %v. Error: %e", date, s.Dates[0].Date, parseError)
+	return DateData{}, fmt.Errorf("unable to find a matching date from mlbstats: Looking for %v. Received %v. Error: %v", date, s.Dates[0].Date, parseError)
 }
 
 // InProgress returns a bool given a game's current state if the game is in progress or not
