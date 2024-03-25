@@ -7,10 +7,12 @@ import (
 
 // Date validates if a Schedule has a given date and returns a DateData object if it exists
 func (s Schedule) Date(date time.Time) (DateData, error) {
+	var parseError error
 	for _, d := range s.Dates {
 		dateString := d.Date
 		dateTime, err := time.Parse("2006-01-02", dateString)
 		if err != nil {
+			parseError = err
 			continue
 		}
 		// Check the days are equal
@@ -19,7 +21,7 @@ func (s Schedule) Date(date time.Time) (DateData, error) {
 		}
 	}
 
-	return DateData{}, fmt.Errorf("unable to find a matching date from mlbstats: Looking for %v. Received %v", date, s.Dates[0].Date)
+	return DateData{}, fmt.Errorf("unable to find a matching date from mlbstats: Looking for %v. Received %v. Error: %e", date, s.Dates[0].Date, parseError)
 }
 
 // InProgress returns a bool given a game's current state if the game is in progress or not
