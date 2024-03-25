@@ -639,6 +639,8 @@ var createServiceTimeSeries = func(ctx context.Context, c *monitoring.MetricClie
 func splitCreateTimeSeriesRequest(req *monitoringpb.CreateTimeSeriesRequest) (*monitoringpb.CreateTimeSeriesRequest, *monitoringpb.CreateTimeSeriesRequest) {
 	var serviceReq, nonServiceReq *monitoringpb.CreateTimeSeriesRequest
 	serviceTs, nonServiceTs := splitTimeSeries(req.TimeSeries)
+	// reset timeseries as we just split it to avoid cloning it in the calls below
+	req.TimeSeries = nil
 	if len(serviceTs) > 0 {
 		serviceReq = proto.Clone(req).(*monitoringpb.CreateTimeSeriesRequest)
 		serviceReq.TimeSeries = serviceTs
@@ -681,6 +683,7 @@ func serviceMetric(metricType string) bool {
 var knownExternalMetricPrefixes = []string{
 	"custom.googleapis.com/",
 	"external.googleapis.com/",
+	"workload.googleapis.com/",
 }
 
 // builtinMetric returns true if a MetricType is a heuristically known
