@@ -7,7 +7,7 @@ import (
 
 // Date validates if a Schedule has a given date and returns a DateData object if it exists
 func (s Schedule) Date(date time.Time) (DateData, error) {
-	if s.Dates == nil {
+	if s.Dates == nil && len(s.Dates) == 0 {
 		return DateData{}, fmt.Errorf("there are no dates in the schedule")
 	}
 
